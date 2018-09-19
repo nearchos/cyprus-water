@@ -123,6 +123,16 @@
         <servlet-name>TimeseriesJSP</servlet-name>
         <url-pattern>/graphs/timeseries</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>APIGuide</servlet-name>
+        <jsp-file>/api.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>APIGuide</servlet-name>
+        <url-pattern>/api</url-pattern>
+        <url-pattern>/guide</url-pattern>
+    </servlet-mapping>
     <!--End of Pages-->
 
     <!--Security constraints-->
