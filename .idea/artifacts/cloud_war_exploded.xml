@@ -11,6 +11,17 @@
           <element id="library" level="project" name="com.google.appengine:appengine-api-1.0-sdk:Release" />
           <element id="library" level="project" name="javax.servlet:servlet-api:2.5" />
           <element id="library" level="project" name="com.google.code.gson:gson:2.8.5" />
+          <element id="library" level="project" name="com.google.guava:guava:26.0-jre" />
+          <element id="library" level="project" name="org.jsoup:jsoup:1.11.3" />
+          <element id="file-copy" path="$PROJECT_DIR$/cloud/lib/jsoup-1.11.2.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/cloud/lib/commons-collections4-4.1.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/cloud/lib/jxl-2.6.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/cloud/lib/poi-3.17.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/cloud/lib/poi-ooxml-3.17.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/cloud/lib/poi-ooxml-schemas-3.17.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/cloud/lib/xmlbeans-2.6.0.jar" />
+          <element id="library" level="application" name="com.google.code.gson:gson:2.8.5" />
+          <element id="library" level="project" name="org.apache.poi:poi:4.0.0" />
         </element>
       </element>
     </root>

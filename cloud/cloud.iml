@@ -24,10 +24,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="PROVIDED" name="Google App Engine Standard Local Server" level="application_server_libraries" />
     <orderEntry type="library" name="com.google.appengine:appengine-api-1.0-sdk:Release" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="javax.servlet:servlet-api:2.5" level="project" />
-    <orderEntry type="library" name="com.google.code.gson:gson:2.8.5" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -54,5 +52,9 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="org.jsoup:jsoup:1.11.3" level="project" />
+    <orderEntry type="library" name="com.google.guava:guava:26.0-jre" level="project" />
+    <orderEntry type="library" name="org.apache.poi:poi:4.0.0" level="project" />
+    <orderEntry type="library" name="com.google.code.gson:gson:2.8.5" level="project" />
   </component>
 </module>
