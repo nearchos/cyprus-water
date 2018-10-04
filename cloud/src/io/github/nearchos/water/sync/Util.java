@@ -74,19 +74,28 @@ public class Util {
         }
     }
 
+    private static final Vector<String> damNamesEn = new Vector<>(Arrays.asList(Data.DAM_NAMES_EN));
+    private static final Vector<String> damNamesEl = new Vector<>(Arrays.asList(Data.DAM_NAMES_EL));
+
     static DayStatistics getDayStatistics(final Workbook workbook) throws IOException {
         Date date;
         Map<String,Double> mapStorage = new HashMap<>();
         Map<String,Double> mapInflow = new HashMap<>();
 
-        final Vector<String> damNamesEn = new Vector<>(Arrays.asList(Data.DAM_NAMES_EN));
-
         try {
             final Sheet sheet = workbook.getSheetAt(0);
+//for(int c = 5; c <=5; c++) {
+//    for(int r = 5; r <= 15; r++) {
+//        System.out.println(r + "," + c + " -> " + sheet.getRow(r).getCell(c).getStringCellValue());
+//    }
+//}
             date = sheet.getRow(9).getCell(11).getDateCellValue();
             for(int j = 16; j < 41; j++) {
-                String damName = sheet.getRow(j).getCell(1).getStringCellValue().trim(); {
+                final String damName = getDamNameFrmEnglishOrGreek(sheet.getRow(j).getCell(1).getStringCellValue().trim());
+                {
+//System.out.println("damName: " + damName);
                     double damStorage = sheet.getRow(j).getCell(7).getNumericCellValue();
+//System.out.println("damStorage: " + damStorage);
                     if(!damName.isEmpty() && damNamesEn.contains(damName)) {
                         mapStorage.put(damName, damStorage);
                     }
@@ -103,5 +112,14 @@ public class Util {
         }
 
         return new DayStatistics(date, mapStorage, mapInflow);
+    }
+
+    private static String getDamNameFrmEnglishOrGreek(final String damNameInEnOrEl) {
+        if(damNamesEn.contains(damNameInEnOrEl)) return damNameInEnOrEl;
+        else { // look it up if it's in Greek
+            final int index = damNamesEl.indexOf(damNameInEnOrEl);
+            if(index >= 0) return damNamesEn.get(index);
+            else return damNameInEnOrEl;
+        }
     }
 }

@@ -66,7 +66,7 @@
     <p class="answer">This is an open repository of information and functionality related to Cyprus' water reservoirs and their storage. You can learn about dams in Cyprus and their storage presently, and in the past.</p>
 
     <p class="question">Where do you get the data from?</p>
-    <p class="answer">From the website of the <a href="http://www.cyprus.gov.cy/moa/wdd/WDD.nsf/reservoir_en/reservoir_en?OpenDocument" target="_blank">Water Development Department</a>.</p>
+    <p class="answer">From the website of the <a href="http://www.moa.gov.cy/moa/wdd/wdd.nsf/index_gr/index_gr" target="_blank">Water Development Department</a>.</p>
 
     <p class="question">Can I create an app that uses this data?</p>
     <p class="answer">Yes. You can use the API described below. If you do this, we expect you to make fair use of the resource which is provided for free and without any guarantee. We would also appreciate but not require an acknowledgement/attribution.</p>

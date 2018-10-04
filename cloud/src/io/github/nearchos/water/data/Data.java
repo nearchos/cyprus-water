@@ -50,6 +50,27 @@ public class Data {
             "Xyliatos"
     };
 
+    public static final String [] DAM_NAMES_EL = new String [] {
+            "Αχνα",
+            "Αγία Μαρίνα",
+            "Αργάκα",
+            "Αρμίνου",
+            "Ασπρόκρεμμος",
+            "Διπόταμος",
+            "Ευρέτου",
+            "Γερμασόγεια",
+            "Καλαβασός",
+            "Καλοπαναγιώτης",
+            "Κανναβιού",
+            "Κούρης",
+            "Λεύκαρα",
+            "Μαυροκόλυμπος",
+            "Πολεμίδια",
+            "Πωμός",
+            "Βυζακιά",
+            "Ξυλιάτος"
+    };
+
     public static Vector<Dam> getDams() {
         // first parse the JSON to produce an array of dams
         final Dam [] allDamsArray = gson.fromJson(DAMS_JSON, Dam[].class);

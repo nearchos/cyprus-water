@@ -35,6 +35,12 @@ public class GrabServlet extends HttpServlet {
 
     private static final Gson gson = new Gson();
 
+    //    private static final String WDD_ROOT = "http://www.cyprus.gov.cy/moa/wdd/WDD.nsf/reservoir_en/reservoir_en?OpenDocument";
+    private static final String WDD_ROOT = "http://www.moa.gov.cy/moa/wdd/wdd.nsf/page18_gr/page18_gr?opendocument";
+
+    //    private String DOCUMENT_URL_PREFIX = "http://www.cyprus.gov.cy/moa/wdd/WDD.nsf";
+    private static String DOCUMENT_URL_PREFIX = "http://www.moa.gov.cy/moa/wdd/wdd.nsf";
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
@@ -46,7 +52,7 @@ public class GrabServlet extends HttpServlet {
         final Element element = elements.first();
         final String link = element.attr("href");
         // inferring link to date's data
-        final String absoluteLink = "http://www.cyprus.gov.cy/moa/wdd/WDD.nsf" + link.substring(2);
+        final String absoluteLink = DOCUMENT_URL_PREFIX + link.substring(2);
         log("fetching XLS from absoluteLink: "  + absoluteLink);
 
         // fetching and processing XLS
@@ -65,8 +71,6 @@ public class GrabServlet extends HttpServlet {
             log("Skipped as dayStatistics already in datastore for: " + date);
         }
     }
-
-    private static final String WDD_ROOT = "http://www.cyprus.gov.cy/moa/wdd/WDD.nsf/reservoir_en/reservoir_en?OpenDocument";
 
     private DayStatistics getDayStatistics(final String absoluteLink) throws IOException {
         final org.apache.poi.ss.usermodel.Workbook workbook = Util.doRequestXls(absoluteLink);
