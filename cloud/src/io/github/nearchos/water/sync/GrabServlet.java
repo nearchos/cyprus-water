@@ -41,18 +41,28 @@ public class GrabServlet extends HttpServlet {
     //    private String DOCUMENT_URL_PREFIX = "http://www.cyprus.gov.cy/moa/wdd/WDD.nsf";
     private static String DOCUMENT_URL_PREFIX = "http://www.moa.gov.cy/moa/wdd/wdd.nsf";
 
+    private static String getAbsoluteLink() throws IOException {
+        // fetching and parsing root web page
+        Document doc = Jsoup.connect(WDD_ROOT).get();
+        // log(doc.title());
+        final Elements elements = doc.select("a[href]");
+        for(final Element element : elements) {
+            final String link = element.attr("abs:href");
+            if(link.endsWith("xls") || link.endsWith(".xlsx")) {
+                System.out.println("link: " + link);
+                final String absoluteLink = link;
+                System.out.println("absoluteLink: " + absoluteLink);
+                return absoluteLink;
+            }
+        }
+        throw new RuntimeException("Could not find XLS or XLSX link!"); // todo send an email to notify me?
+    }
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        // fetching and parsing root web page
-        Document doc = Jsoup.connect(WDD_ROOT).get();
-        // log(doc.title());
-        final Elements elements = doc.getElementsByTag("area");
-        final Element element = elements.first();
-        final String link = element.attr("href");
-        // inferring link to date's data
-        final String absoluteLink = DOCUMENT_URL_PREFIX + link.substring(2);
+        final String absoluteLink = getAbsoluteLink();
         log("fetching XLS from absoluteLink: "  + absoluteLink);
 
         // fetching and processing XLS
@@ -72,8 +82,20 @@ public class GrabServlet extends HttpServlet {
         }
     }
 
-    private DayStatistics getDayStatistics(final String absoluteLink) throws IOException {
+    private static DayStatistics getDayStatistics(final String absoluteLink) throws IOException {
         final org.apache.poi.ss.usermodel.Workbook workbook = Util.doRequestXls(absoluteLink);
         return Util.getDayStatistics(workbook);
+    }
+
+    public static void main(String[] args) {
+        try {
+            final String absoluteLink = getAbsoluteLink();
+
+            // fetching and processing XLS
+            final DayStatistics dayStatistics = getDayStatistics(absoluteLink);
+            final String date = dayStatistics.getDateAsString();
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
     }
 }
