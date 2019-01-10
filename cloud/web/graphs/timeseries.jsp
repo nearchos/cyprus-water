@@ -1,33 +1,34 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%--
-  ~ Copyright (c) 2018.
-  ~
-  ~ THE WORK (AS DEFINED BELOW) IS PROVIDED UNDER THE TERMS OF THIS CREATIVE COMMONS PUBLIC LICENSE ("CCPL" OR
-  ~  "LICENSE"). THE WORK IS PROTECTED BY COPYRIGHT AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER
-  ~   THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
-  ~
-  ~ BY EXERCISING ANY RIGHTS TO THE WORK PROVIDED HERE, YOU ACCEPT AND AGREE TO BE BOUND BY THE TERMS OF THIS
-  ~  LICENSE. TO THE EXTENT THIS LICENSE MAY BE CONSIDERED TO BE A CONTRACT, THE LICENSOR GRANTS YOU THE RIGHTS
-  ~   CONTAINED HERE IN CONSIDERATION OF YOUR ACCEPTANCE OF SUCH TERMS AND CONDITIONS.
-  ~
-  ~ The complete license is available at https://creativecommons.org/licenses/by/3.0/legalcode
-  --%>
-
 <!DOCTYPE html>
+<!--
+~ Copyright (c) 2019.
+~
+~ THE WORK (AS DEFINED BELOW) IS PROVIDED UNDER THE TERMS OF THIS CREATIVE COMMONS PUBLIC LICENSE ("CCPL" OR
+~  "LICENSE"). THE WORK IS PROTECTED BY COPYRIGHT AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER
+~   THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
+~
+~ BY EXERCISING ANY RIGHTS TO THE WORK PROVIDED HERE, YOU ACCEPT AND AGREE TO BE BOUND BY THE TERMS OF THIS
+~  LICENSE. TO THE EXTENT THIS LICENSE MAY BE CONSIDERED TO BE A CONTRACT, THE LICENSOR GRANTS YOU THE RIGHTS
+~   CONTAINED HERE IN CONSIDERATION OF YOUR ACCEPTANCE OF SUCH TERMS AND CONDITIONS.
+~
+~ The complete license is available at https://creativecommons.org/licenses/by/3.0/legalcode
+-->
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Water level over time</title>
     <!-- including ECharts file -->
     <link rel="stylesheet" href="../css/cyprus-water.css">
-    <script src="../js/echarts.min.js"></script></head>
+    <script src="../js/echarts.min.js"></script>
+</head>
 <body>
 
-    <p class="title">Cyprus Water</p>
+<p class="title">Cyprus Water</p>
 
-    <div id="graph" style="width: 100%;height:800px;"></div>
+<div id="graph" style="width: 100%;height:800px;"></div>
 
-    <p>Stacked area graph of water level in all major dams over time</p>
+<p>Stacked area graph of water level in all major dams over time</p>
 
 <script>
 
@@ -43,14 +44,20 @@
         });
 
         let timestamps = Object.keys(percentages);
+        let x = {};
+        for(let i in timestamps) {
+            let timestamp = timestamps[i];
+            x[timestamp] = new Date(timestamp); // convert to JSON timestamp
+        }
+
         let damNames = Object.keys(percentages[timestamps[0]].damNamesToPercentage);
-        // console.debug("timestamps: " + timestamps);
-        // console.debug("dams: " + dams);
         let damsToTimeSeries = {}; // init empty dictionary
         damNames.forEach(function(dam) {
             let damTimeSeries = [];
             timestamps.forEach(function(timestamp) {
-                damTimeSeries.push((percentages[timestamp].damNamesToPercentage[dam] * damCapacities[dam]).toFixed(1));
+                let damEntry = [x[timestamp], (percentages[timestamp].damNamesToPercentage[dam] * damCapacities[dam]).toFixed(1)];
+                damTimeSeries.push(damEntry);
+                // damTimeSeries.push((percentages[timestamp].damNamesToPercentage[dam] * damCapacities[dam]).toFixed(1));
             });
             damsToTimeSeries[dam] = damTimeSeries;
         });
@@ -71,6 +78,7 @@
             },
             tooltip : {
                 trigger: 'axis',
+                size: '',
                 axisPointer: {
                     type: 'cross',
                     label: {
@@ -98,18 +106,22 @@
                 bottom: '3%',
                 containLabel: true
             },
+            calculable: true,
             xAxis : [
                 {
-                    type : 'category',
+                    type : 'time',
                     boundaryGap : false,
-                    data : timestamps
+                    axisLabel: {
+                        formatter: (function(value){
+                            let date = new Date(value);
+                            let month = date.getMonth() + 1;
+                            let day = date.getDay();
+                            return date.getFullYear() + (month < 10 ? "-0" : "-") + month + (day < 10 ? "-0" : "-") + day;
+                        })
+                    }
                 }
             ],
-            yAxis : [
-                {
-                    type : 'value'
-                }
-            ],
+            yAxis : {},
             series : [
                 {
                     name:'Kouris',
@@ -245,7 +257,20 @@
                     areaStyle: {opacity: 0},
                     data: damsToTimeSeries['Total']
                 }
+            ],
+            dataZoom: [
+                {
+                    type: 'inside'
+                },
+                {
+                    show: true,
+                    type: 'slider',
+                    startValue: x[0],
+                    end: 100,
+                    minValueSpan: 10
+                }
             ]
+
         };
 
         // use configuration item and data specified to show chart

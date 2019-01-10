@@ -89,7 +89,7 @@ public class Util {
 //        System.out.println(r + "," + c + " -> " + sheet.getRow(r).getCell(c).getStringCellValue());
 //    }
 //}
-            date = sheet.getRow(9).getCell(11).getDateCellValue();
+            date = sheet.getRow(10).getCell(11).getDateCellValue();
             for(int j = 16; j < 41; j++) {
                 final String damName = getDamNameFrmEnglishOrGreek(sheet.getRow(j).getCell(1).getStringCellValue().trim());
                 {

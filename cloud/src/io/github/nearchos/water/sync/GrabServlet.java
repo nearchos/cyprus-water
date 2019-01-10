@@ -94,6 +94,7 @@ public class GrabServlet extends HttpServlet {
             // fetching and processing XLS
             final DayStatistics dayStatistics = getDayStatistics(absoluteLink);
             final String date = dayStatistics.getDateAsString();
+            System.out.println("completed for date -> " + date);
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
