@@ -250,7 +250,7 @@
         var config = liquidFillGaugeDefaultSettings();
         config.circleColor = "#d3d3d3";
         config.textColor = "#3333FF";
-        config.waveTextColor = "#b5f7ff";
+        config.waveTextColor = "#3333FF";
         config.waveColor = "#b5f7ff";
         config.circleThickness = 0.1;
         config.textVertPosition = 0.5;
