@@ -48,7 +48,7 @@ public class GrabServlet extends HttpServlet {
         final Elements elements = doc.select("a[href]");
         for(final Element element : elements) {
             final String link = element.attr("abs:href");
-            if(link.endsWith("xls") || link.endsWith(".xlsx")) {
+            if(link.toLowerCase().contains(".xls") || link.toLowerCase().contains(".xlsx")) {
                 System.out.println("link: " + link);
                 final String absoluteLink = link;
                 System.out.println("absoluteLink: " + absoluteLink);
