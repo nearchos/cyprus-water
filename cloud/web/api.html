@@ -57,7 +57,7 @@
     </p>
     <p>
         Showing data for <span id="selectedDateSpan">01/01/2019</span>
-        <input type="range" min="1" max="1" value="1" step="2" class="slider" id="dateSelector">
+        <input type="range" min="1" max="1" value="1" class="slider" id="dateSelector">
         <div class="sliderticks" id="rangeTicks"></div>
     </p>
     <p style="text-align: center; color: #3333ff; font-weight: bold;">Water level in main reservoirs in Cyprus</p>
@@ -280,7 +280,7 @@
     function getPercentagesForDate(selectedDate) {
         // return the percentage for the selected date (or the most recent date in the past if specified one is not mapped)
         let selectedPercentages = null;
-        let date = new Date(selectedDate);
+        let date = selectedDate;
         while(selectedPercentages === null || selectedPercentages === undefined) {
             selectedPercentages = percentages[getFormattedDate(date)];
             date = new Date(date.getTime() - ONE_DAY);
@@ -311,7 +311,7 @@
                 //update date selector
                 let datesWithData = Object.keys(percentages);
                 // create array with 'all' dates
-                availableDates = getDatesRange(new Date(datesWithData[0]), new Date(datesWithData[datesWithData.length - 1]));
+                availableDates = getDatesRange(new Date(datesWithData[0]));
                 // update slider
                 slider.min = 0;
                 slider.max = availableDates.length - 1;
@@ -326,6 +326,8 @@
                     if(currentMonth !== lastMonth) {
                         lastMonth = currentMonth;
                         ticksHtml += '<p>' + lastMonth + '/' + currentYear + '</p>';
+                    } else {
+                        ticksHtml += '<p></p>';
                     }
                 });
                 sliderTicks.innerHTML = ticksHtml;
@@ -341,10 +343,11 @@
 
     const ONE_DAY = 24 * 60 * 60 * 1000;
 
-    function getDatesRange(startDate, endDate) {
+    function getDatesRange(startDate) {
         let arr = [];
         let date = startDate;
-        while (date.getTime() < endDate.getTime()) {
+        let now = new Date().getTime();
+        while (date.getTime() <= now) {
             arr.push(date);
             date = new Date(date.getTime() + ONE_DAY);
         }
