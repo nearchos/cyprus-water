@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright (c) 2018.
+  ~
+  ~ THE WORK (AS DEFINED BELOW) IS PROVIDED UNDER THE TERMS OF THIS CREATIVE COMMONS PUBLIC LICENSE ("CCPL" OR
+  ~  "LICENSE"). THE WORK IS PROTECTED BY COPYRIGHT AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER
+  ~   THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
+  ~
+  ~ BY EXERCISING ANY RIGHTS TO THE WORK PROVIDED HERE, YOU ACCEPT AND AGREE TO BE BOUND BY THE TERMS OF THIS
+  ~  LICENSE. TO THE EXTENT THIS LICENSE MAY BE CONSIDERED TO BE A CONTRACT, THE LICENSOR GRANTS YOU THE RIGHTS
+  ~   CONTAINED HERE IN CONSIDERATION OF YOUR ACCEPTANCE OF SUCH TERMS AND CONDITIONS.
+  ~
+  ~ The complete license is available at https://creativecommons.org/licenses/by/3.0/legalcode
+  -->
+
+<html lang="en">
+<head>
+    <title>Cyprus Water - Open Data and API</title>
+    <link rel="stylesheet" href="css/cyprus-water.css">
+    <link rel="stylesheet" href="css/slider.css">
+    <script src="https://cdn.rawgit.com/zenorocha/clipboard.js/v2.0.0/dist/clipboard.min.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js" language="JavaScript"></script>
+    <script src="js/liquidFillGauge.js" language="JavaScript"></script>
+    <script src="js/dams.js"></script>
+</head>
+
+<body>
+
+<nav>
+    Quick link to
+    <a href="#home">Home</a> |
+    <a href="#faq">FAQ</a> |
+    <a href="#api">API</a> |
+    <a href="#graphs">Graphs</a> |
+    <a href="#about">About</a>
+</nav>
+
+<!--#home-->
+<a name="home"></a>
+
+<p class="title">Cyprus Water</p>
+
+<p class="subtitle">Welcome to Cyprus Water, an open repository of data and functionality on water reservoires in Cyprus.</p>
+
+<div style="margin: 50px;">
+    <!--Gauge as per http://bl.ocks.org/brattonc/5e5ce9beee483220e2f6-->
+    <svg id="water-gauge" width="100%" height="200"></svg>
+    <p style="text-align: center; color: #3333ff; font-weight: bold;">Water level across all reservoirs in Cyprus</p>
+</div>
+
+<div>
+    <canvas id="myCanvas" width="960" height="200" style="border:1px solid #d3d3d3;">Your browser does not support the HTML5 canvas tag.</canvas>
+
+    <p>
+        <input id="keepAspectCheckbox" title="Toggle proportional drawing mode" type="checkbox" onclick="drawDamPercentagesWithAspect()" />
+        Size bars according to dam capacity
+    </p>
+    <p>
+        Showing data for <span id="selectedDateSpan">01/01/2019</span>
+        <input type="range" min="1" max="1" value="1" step="2" class="slider" id="dateSelector">
+        <div class="sliderticks" id="rangeTicks"></div>
+    </p>
+    <p style="text-align: center; color: #3333ff; font-weight: bold;">Water level in main reservoirs in Cyprus</p>
+</div>
+
+<!--#faq-->
+<a name="faq"></a>
+
+<p class="section">Frequently Asked Questions (FAQ)</p>
+
+<p class="question">What is this website?</p>
+<p class="answer">This is an open repository of information and functionality related to Cyprus' water reservoirs and their storage. You can learn about dams in Cyprus and their storage presently, and in the past.</p>
+
+<p class="question">Where do you get the data from?</p>
+<p class="answer">From the website of the <a href="http://www.moa.gov.cy/moa/wdd/wdd.nsf/index_gr/index_gr" target="_blank">Water Development Department</a>.</p>
+
+<p class="question">Can I create an app that uses this data?</p>
+<p class="answer">Yes. You can use the API described below. If you do this, we expect you to make fair use of the resource which is provided for free and without any guarantee. We would also appreciate but not require an acknowledgement/attribution.</p>
+
+<p class="question">How do I acknowledge this project, its data and its services?</p>
+<p class="answer">Use the following text</p>
+<blockquote>Use of <a href="http://cyprus-water.appspot.com">cyprus-water</a> data and functionality is licensed under <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank">CC BY 2.0</a></blockquote>
+<p class="answer">which you could produce with this sample HTML code</p>
+
+<div class="input-group">
+    <div class="input-group-button">
+        <button class="btn" data-clipboard-target="#copyright_html" title="Copy to clipboard">
+            Copy <img class="clippy" width="13" src="images/clippy.svg" alt="Copy to clipboard">
+        </button>
+    </div>
+    <div class="html hljs snippet" id="copyright_html">
+        <code>Use of &lt;a href=&quot;http://cyprus-water.appspot.com&quot;&gt;cyprus-water&lt;/a&gt; data and functionality is licensed under &lt;a href=&quot;https://creativecommons.org/licenses/by/2.0/&quot; target=&quot;_blank&quot;&gt;CC BY 2.0&lt;/a&gt;</code>
+    </div>
+</div>
+
+<!--#api-->
+<a name="api"></a>
+
+<p class="section">Application Programming Interface (API)</p>
+
+<div class="api_call">
+
+    <p class="question">/api/dams</p>
+    <p class="answer">Queries static information about the main water reservoirs (dams) in Cyprus. The reply is encoded in JSON.</p>
+
+    <div class="input-group">
+        <div class="input-group-button">
+            <span class="link-to-github">Returns an array of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/src/io/github/nearchos/water/data/Dam.java" target="_blank">Dam</a></code>s</span>
+            <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/api/dams','_blank');">
+                Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
+            </button>
+            <button class="btn" data-clipboard-target="#api_data_dams" title="Copy to clipboard">
+                Copy <img class="clippy" width="13" src="images/clippy.svg" alt="Copy to clipboard">
+            </button>
+        </div>
+        <div class="html hljs snippet" id="api_data_dams">
+            <code>https://cyprus-water.appspot.com/api/dams</code>
+        </div>
+    </div>
+</div>
+
+
+<div class="api_call">
+
+    <p class="question">/api/date-statistics</p>
+    <p class="answer">Queries the <i>statistics</i> of water reservoirs on a specific date. The query uses the format yyyy-MM-dd
+        (e.g. "?date=2018-06-21" to query the statistics for June 21st, 2018, or if no data exist for this date, then the latest date before the specified one).
+        If no date parameter is specified, the server implies the current date.
+        <!--The "<code>/api/inflows</code>" and "<code>/api/storage</code>" are equivalent aliases.-->
+        The reply is encoded in JSON.</p>
+
+    <div class="input-group">
+        <div class="input-group-button">
+            <span class="link-to-github">Returns an instance of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/src/io/github/nearchos/water/data/DayStatistics.java" target="_blank">DayStatistics</a></code></span>
+            <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/api/date-statistics?date=2018-06-21','_blank');">
+                Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
+            </button>
+            <button class="btn" data-clipboard-target="#api_data_statistics" title="Copy to clipboard">
+                Copy <img class="clippy" width="13" src="images/clippy.svg" alt="Copy to clipboard">
+            </button>
+        </div>
+        <div class="html hljs snippet" id="api_data_statistics">
+            <code>https://cyprus-water.appspot.com/api/date-statistics?date=2018-06-21</code>
+        </div>
+    </div>
+</div>
+
+
+<div class="api_call">
+    <p class="question">/api/percentages</p>
+    <p class="answer">Queries the storage <i>percentages</i> of the main water reservoirs on a specific date. The query uses the format yyyy-MM-dd
+        (e.g. "?date=2018-06-21" to query the percentages for June 21st, 2018, or if no data exist for this date, then the latest date before the specified one).
+        If no date parameter is specified, the server implies the current date. The reply is encoded in JSON.</p>
+
+    <div class="input-group">
+        <div class="input-group-button">
+            <span class="link-to-github">Returns an instance of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/src/io/github/nearchos/water/data/DamsPercentage.java" target="_blank">DamsPercentage</a></code></span>
+            <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/api/percentages?date=2018-06-21','_blank');">
+                Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
+            </button>
+            <button class="btn" data-clipboard-target="#api_data_percentages" title="Copy to clipboard">
+                Copy <img class="clippy" width="13" src="images/clippy.svg" alt="Copy to clipboard">
+            </button>
+        </div>
+        <div class="html hljs snippet" id="api_data_percentages">
+            <code>https://cyprus-water.appspot.com/api/percentages?date=2018-06-21</code>
+        </div>
+    </div>
+</div>
+
+
+<div class="api_call">
+    <p class="question">/api/timeseries</p>
+    <p class="answer">Queries the <i>timeseries</i> of the water level through time. The query returns a
+        Timeseries object containing basic info of the dams, plus an ordered array of dates to percentagesThe reply is encoded in JSON.</p>
+
+    <div class="input-group">
+        <div class="input-group-button">
+            <span class="link-to-github">Returns an instance of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/src/io/github/nearchos/water/data/Timeseries.java" target="_blank">Timeseries</a></code></span>
+            <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/api/timeseries','_blank');">
+                Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
+            </button>
+            <button class="btn" data-clipboard-target="#api_data_timeseries" title="Copy to clipboard">
+                Copy <img class="clippy" width="13" src="images/clippy.svg" alt="Copy to clipboard">
+            </button>
+        </div>
+        <div class="html hljs snippet" id="api_data_timeseries">
+            <code>https://cyprus-water.appspot.com/api/timeseries</code>
+        </div>
+    </div>
+</div>
+
+
+<p class="subtitle">The following are Admin-only API calls which you cannot access (and you shouldn't need to).</p>
+
+<div class="api_call">
+    <p class="question">/sync/grab</p>
+    <p class="answer">Triggers a <i>grab</i> from the source website (requires authentication and admin rights which you most likely don't have). Returns a message encoded in JSON.</p>
+
+    <div class="input-group">
+        <div class="input-group-button">
+            <span class="link-to-github">The reply is an instance of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/src/io/github/nearchos/water/api/Message.java" target="_blank">Message</a></code></span>
+            <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/sync/grab','_blank');">
+                Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
+            </button>
+            <button class="btn" data-clipboard-target="#api_sync_grab" title="Copy to clipboard">
+                Copy <img class="clippy" width="13" src="images/clippy.svg" alt="Copy to clipboard">
+            </button>
+        </div>
+        <div class="html hljs snippet" id="api_sync_grab">
+            <code>https://cyprus-water.appspot.com/sync/grab</code>
+        </div>
+    </div>
+</div>
+
+<!--#graphs-->
+<a name="graphs"></a>
+
+<p class="section">Graphs</p>
+
+<section>
+    <article>
+        <p>Timeseries graph, showing the water level across the main reservoirs over time.</p>
+        <p><a href="/graphs/timeseries" target="_blank">/graphs/timeseries</a></p>
+    </article>
+</section>
+
+<!--#about-->
+<a name="about"></a>
+
+<section>
+
+    <p class="section">About</p>
+
+    <article>
+        <p>Created by <a href="http://nearchos.github.io" target="_blank">Nearchos Paspallis</a>.</p>
+        <figure>
+            <a href="http://inspirecenter.org" target="_blank"><img src="images/inspire.png" title="Inspire Research Center" alt="Inspire Research Center"></a>
+        </figure>
+        <figure>
+            <a href="http://uclancyprus.ac.cy" target="_blank"><img src="images/uclan.png" title="UCLan Cyprus" alt="UCLan Cyprus"></a>
+        </figure>
+    </article>
+
+</section>
+
+<footer>
+    <p><a href="http://cyprus-water.appspot.com">cyprus-water.appspot.com</a> &copy; 2018</p>
+</footer>
+
+<script>
+    // init clipboard
+    new ClipboardJS('.btn'); // initialize clipboard code for buttons of class 'btn'
+
+    // init water gauge
+    var config = liquidFillGaugeDefaultSettings();
+    config.circleColor = "#d3d3d3";
+    config.textColor = "#3333FF";
+    config.waveTextColor = "#3333FF";
+    config.waveColor = "#b5f7ff";
+    config.circleThickness = 0.1;
+    config.textVertPosition = 0.5;
+    config.waveAnimateTime = 3000;
+    var gauge = loadLiquidFillGauge("water-gauge", 0, config);
+
+    // let damNamesToPercentage = null;
+    let damsArray = null;
+
+    // Draw dam wih levels
+    function drawDamPercentagesWithAspect() {
+        let selectedDate = availableDates[slider.value];
+        let selectedDamNamesToPercentage = getPercentagesForDate(selectedDate);
+        gauge.update(100.0 * selectedDamNamesToPercentage.totalPercentage);
+        var c = document.getElementById("myCanvas");
+        if(damsArray != null && selectedDamNamesToPercentage != null) {
+            drawDamPercentages(c, selectedDamNamesToPercentage, damsArray, keepAspectCheckbox.checked);
+        }
+    }
+
+    function getPercentagesForDate(selectedDate) {
+        // return the percentage for the selected date (or the most recent date in the past if specified one is not mapped)
+        let selectedPercentages = null;
+        let date = new Date(selectedDate);
+        while(selectedPercentages === null || selectedPercentages === undefined) {
+            selectedPercentages = percentages[getFormattedDate(date)];
+            date = new Date(date.getTime() - ONE_DAY);
+        }
+        return selectedPercentages;
+    }
+
+    let percentages = {};
+    let availableDates = [];
+
+    let slider = document.getElementById("dateSelector");
+    let selectedDateSpan = document.getElementById("selectedDateSpan");
+    let sliderTicks = document.getElementById("rangeTicks");
+
+    slider.oninput = function() {
+        selectedDateSpan.innerText = getFormattedDate(availableDates[slider.value]);
+        // update graph
+        drawDamPercentagesWithAspect();
+    };
+
+    function loadTimeseries() {
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState === 4 && this.status === 200) {
+                // set the current dam level
+                timeseries = JSON.parse(this.responseText);
+                percentages = timeseries.percentages;
+                //update date selector
+                let datesWithData = Object.keys(percentages);
+                // create array with 'all' dates
+                availableDates = getDatesRange(new Date(datesWithData[0]), new Date(datesWithData[datesWithData.length - 1]));
+                // update slider
+                slider.min = 0;
+                slider.max = availableDates.length - 1;
+                slider.value = availableDates.length - 1;
+                selectedDateSpan.innerText = getFormattedDate(availableDates[slider.value]);
+                // update slider ticks
+                let lastMonth = 0;
+                let ticksHtml = '';
+                availableDates.forEach(function(d) {
+                    let currentMonth = new Date(d).getMonth() + 1;
+                    let currentYear = new Date(d).getFullYear();
+                    if(currentMonth !== lastMonth) {
+                        lastMonth = currentMonth;
+                        ticksHtml += '<p>' + lastMonth + '/' + currentYear + '</p>';
+                    }
+                });
+                sliderTicks.innerHTML = ticksHtml;
+                // init dams variable
+                damsArray = timeseries.dams;
+                // draw the currently selected date
+                drawDamPercentagesWithAspect();
+            }
+        };
+        xhttp.open("GET", "https://cyprus-water.appspot.com/api/timeseries", true);
+        xhttp.send();
+    }
+
+    const ONE_DAY = 24 * 60 * 60 * 1000;
+
+    function getDatesRange(startDate, endDate) {
+        let arr = [];
+        let date = startDate;
+        while (date.getTime() < endDate.getTime()) {
+            arr.push(date);
+            date = new Date(date.getTime() + ONE_DAY);
+        }
+        return arr;
+    }
+
+    function getFormattedDate(date) {
+        let day = date.getDate();
+        let month = date.getMonth() + 1;
+        return date.getFullYear() + "-" + (month < 10 ? '0' : '') + month + '-' + (day < 10 ? '0' : '') + day;
+    }
+
+    function init() {
+        loadTimeseries();
+        // loadDamsPercentage();
+    }
+
+    init();
+</script>
+</body>
+
+</html>

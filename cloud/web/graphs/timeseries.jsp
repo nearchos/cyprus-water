@@ -88,7 +88,7 @@
                 formatter: function(params) {
                     let date = new Date(params[0].data[0]);
                     let month = date.getMonth() + 1;
-                    let day = date.getDay();
+                    let day = date.getDate();
                     let dateFormatted = date.getFullYear() + (month < 10 ? "-0" : "-") + month + (day < 10 ? "-0" : "-") + day;
 
                     let tooltipHtml = '<b>' + dateFormatted + '</b><br/>';
