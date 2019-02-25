@@ -55,18 +55,18 @@
         damNames.forEach(function(dam) {
             let damTimeSeries = [];
             timestamps.forEach(function(timestamp) {
-                let damEntry = [x[timestamp], (percentages[timestamp].damNamesToPercentage[dam] * damCapacities[dam]).toFixed(1)];
+                let damEntry = [x[timestamp], (percentages[timestamp].damNamesToPercentage[dam] * damCapacities[dam]).toFixed(1), percentages[timestamp].damNamesToPercentage[dam] * 100];
                 damTimeSeries.push(damEntry);
                 // damTimeSeries.push((percentages[timestamp].damNamesToPercentage[dam] * damCapacities[dam]).toFixed(1));
             });
             damsToTimeSeries[dam] = damTimeSeries;
         });
         // handle totals
-        let totalTimeSeries = [];
-        timestamps.forEach(function(timestamp) {
-            totalTimeSeries.push((percentages[timestamp].totalPercentage * percentages[timestamp].totalCapacityInMCM).toFixed(1));
-        });
-        damsToTimeSeries["Total"] = totalTimeSeries;
+        // let totalTimeSeries = [];
+        // timestamps.forEach(function(timestamp) {
+        //     totalTimeSeries.push((percentages[timestamp].totalPercentage * percentages[timestamp].totalCapacityInMCM).toFixed(1));
+        // });
+        // damsToTimeSeries['Total'] = totalTimeSeries;
 
 
         // based on prepared DOM, initialize echarts instance
@@ -78,12 +78,39 @@
             },
             tooltip : {
                 trigger: 'axis',
-                size: '',
+                size: ' ',
                 axisPointer: {
                     type: 'cross',
                     label: {
                         backgroundColor: '#6a7985'
                     }
+                },
+                formatter: function(params) {
+                    let date = new Date(params[0].data[0]);
+                    let month = date.getMonth() + 1;
+                    let day = date.getDay();
+                    let dateFormatted = date.getFullYear() + (month < 10 ? "-0" : "-") + month + (day < 10 ? "-0" : "-") + day;
+
+                    let tooltipHtml = '<b>' + dateFormatted + '</b><br/>';
+                    tooltipHtml += '<table border="0">';
+                    let totalQuantity = 0;
+                    let totalCapacity = 0;
+                    params.forEach(function(c) {
+                        let quantity = c.data[1];
+                        // tooltipHtml += '<span style="color:#ffffff; text-shadow: 1px 1px ' + c.color + '">' + c.seriesName + ': ' + quantity + '</span><br/>';
+                        let damName = c.seriesName;
+                        let capacity = damCapacities[damName];
+                        let percentage = damsToTimeSeries[damName][c.dataIndex][2];
+                        // tooltipHtml += c.marker + ' ' + damName + ': ' + quantity + ' of ' + capacity + ' (' + percentage + '%)<br/>';
+                        tooltipHtml += '<tr><td align="right">' + damName + '</td><td>' + c.marker + '</td><td>' + quantity + '</td><td>of</td><td align="right">' + capacity.toFixed(1) + '</td><td align="right">(<i>' + percentage.toFixed(1) + '%</i>)</td></tr>';
+                        totalQuantity += Number(quantity);
+                        totalCapacity += capacity;
+                    });
+                    let totalPercentage = totalQuantity / totalCapacity * 100;
+                    tooltipHtml += '<tr><td align="right"><b>TOTAL</b></td><td></td><td><b>' + totalQuantity.toFixed(1) + '</b></td><td><b>of</b></td><td align="right"><b>' + totalCapacity.toFixed(1) + '</b></td><td align="right"><b>(<i>' + totalPercentage.toFixed(1) + '%</i>)</b></td></tr>';
+                    let total = 'tbd';
+                    tooltipHtml += '</table>';
+                    return tooltipHtml;
                 }
             },
             legend: {
@@ -95,7 +122,7 @@
                         show: true,
                         // Show the title when mouse focus
                         title: 'Download as picture',
-                        name: 'cyprus-water.appspot.org'
+                        name: 'cyprus-water.appspot.com'
                     }
                 },
                 right: "50px"
@@ -247,14 +274,14 @@
                 {
                     name:'Total',
                     type:'line',
-                    stack: 'Total',
+                    stack: 'Dams',
                     label: {
                         normal: {
                             show: true,
                             position: 'top'
                         }
                     },
-                    areaStyle: {opacity: 0},
+                    areaStyle: {normal: {}},
                     data: damsToTimeSeries['Total']
                 }
             ],
