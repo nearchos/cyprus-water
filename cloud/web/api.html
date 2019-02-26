@@ -233,19 +233,22 @@
     <p class="section">About</p>
 
     <article>
-        <p>Created by <a href="http://nearchos.github.io" target="_blank">Nearchos Paspallis</a>.</p>
-        <figure>
-            <a href="http://inspirecenter.org" target="_blank"><img src="images/inspire.png" title="Inspire Research Center" alt="Inspire Research Center"></a>
-        </figure>
+        <p>
+            Developed by <a href="http://computing.uclancyprus.ac.cy" target="_blank">Computing</a> at <a href="http://www.uclancyprus.ac.cy" target="_blank">UCLan Cyprus</a>.
+            For details please contact <a href="http://nearchos.github.io" target="_blank">Dr Nearchos Paspallis</a>.
+        </p>
         <figure>
             <a href="http://uclancyprus.ac.cy" target="_blank"><img src="images/uclan.png" title="UCLan Cyprus" alt="UCLan Cyprus"></a>
+        </figure>
+        <figure>
+            <a href="http://inspirecenter.org" target="_blank"><img src="images/inspire.png" title="Inspire Research Center" alt="Inspire Research Center"></a>
         </figure>
     </article>
 
 </section>
 
 <footer>
-    <p><a href="http://cyprus-water.appspot.com">cyprus-water.appspot.com</a> &copy; 2018</p>
+    <p><a href="http://cyprus-water.appspot.com">cyprus-water.appspot.com</a> &copy; 2018-2019</p>
 </footer>
 
 <script>
@@ -292,8 +295,8 @@
     let availableDates = [];
 
     let slider = document.getElementById("dateSelector");
-    let selectedDateSpan = document.getElementById("selectedDateSpan");
     let sliderTicks = document.getElementById("rangeTicks");
+    let selectedDateSpan = document.getElementById("selectedDateSpan");
 
     slider.oninput = function() {
         selectedDateSpan.innerText = getFormattedDate(availableDates[slider.value]);
@@ -318,19 +321,20 @@
                 slider.value = availableDates.length - 1;
                 selectedDateSpan.innerText = getFormattedDate(availableDates[slider.value]);
                 // update slider ticks
-                let lastMonth = 0;
                 let ticksHtml = '';
                 availableDates.forEach(function(d) {
-                    let currentMonth = new Date(d).getMonth() + 1;
-                    let currentYear = new Date(d).getFullYear();
-                    if(currentMonth !== lastMonth) {
-                        lastMonth = currentMonth;
-                        ticksHtml += '<p>' + lastMonth + '/' + currentYear + '</p>';
+                    let dd = new Date(d);
+                    let currentDay = dd.getDate();
+                    let currentMonth = dd.getMonth() + 1;
+                    let currentYear = dd.getFullYear();
+                    if(currentDay === 1) {
+                        ticksHtml += '<p>' + currentMonth + '/' + currentYear + '</p>';
                     } else {
                         ticksHtml += '<p></p>';
                     }
                 });
                 sliderTicks.innerHTML = ticksHtml;
+
                 // init dams variable
                 damsArray = timeseries.dams;
                 // draw the currently selected date

@@ -14,6 +14,8 @@
 
 package io.github.nearchos.water.sync;
 
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.gson.Gson;
 import io.github.nearchos.water.data.DatastoreHelper;
 import io.github.nearchos.water.data.DayStatistics;
@@ -27,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.logging.Logger;
 
 public class GrabServlet extends HttpServlet {
@@ -34,6 +37,8 @@ public class GrabServlet extends HttpServlet {
     private static final Logger log = Logger.getLogger("cyprus-water");
 
     private static final Gson gson = new Gson();
+
+    private final MemcacheService memcacheService = MemcacheServiceFactory.getMemcacheService();
 
     //    private static final String WDD_ROOT = "http://www.cyprus.gov.cy/moa/wdd/WDD.nsf/reservoir_en/reservoir_en?OpenDocument";
     private static final String WDD_ROOT = "http://www.moa.gov.cy/moa/wdd/wdd.nsf/page18_gr/page18_gr?opendocument";
@@ -76,6 +81,9 @@ public class GrabServlet extends HttpServlet {
             DatastoreHelper.addDayStatistics(dayStatistics);
             printWriter.println("Added dayStatistics for: " + date);
             log("Added dayStatistics for: " + date + " --> " + dayStatistics);
+            // invalidate possible memcache entry for timeseries
+            final String memcacheKey = "timeseries-" + DayStatistics.SIMPLE_DATE_FORMAT.format(new Date());
+            memcacheService.delete(memcacheKey);
         } else {
             printWriter.println("Skipped as dayStatistics already in datastore for: " + date);
             log("Skipped as dayStatistics already in datastore for: " + date);
