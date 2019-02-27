@@ -40,7 +40,7 @@
 
 <p class="title">Cyprus Water</p>
 
-<p class="subtitle">Welcome to Cyprus Water, an open repository of data and functionality on water reservoires in Cyprus.</p>
+<p class="subtitle">Welcome to Cyprus Water, an open repository of data and functionality on water reservoirs in Cyprus.</p>
 
 <div style="margin: 50px;">
     <!--Gauge as per http://bl.ocks.org/brattonc/5e5ce9beee483220e2f6-->
