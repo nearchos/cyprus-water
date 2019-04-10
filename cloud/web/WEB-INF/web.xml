@@ -125,6 +125,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>SharesJSP</servlet-name>
+        <jsp-file>/graphs/shares.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SharesJSP</servlet-name>
+        <url-pattern>/graphs/shares</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>APIGuide</servlet-name>
         <jsp-file>/api.jsp</jsp-file>
     </servlet>

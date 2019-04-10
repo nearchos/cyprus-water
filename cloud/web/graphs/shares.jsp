@@ -1,0 +1,333 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<!--
+~ Copyright (c) 2019.
+~
+~ THE WORK (AS DEFINED BELOW) IS PROVIDED UNDER THE TERMS OF THIS CREATIVE COMMONS PUBLIC LICENSE ("CCPL" OR
+~  "LICENSE"). THE WORK IS PROTECTED BY COPYRIGHT AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER
+~   THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
+~
+~ BY EXERCISING ANY RIGHTS TO THE WORK PROVIDED HERE, YOU ACCEPT AND AGREE TO BE BOUND BY THE TERMS OF THIS
+~  LICENSE. TO THE EXTENT THIS LICENSE MAY BE CONSIDERED TO BE A CONTRACT, THE LICENSOR GRANTS YOU THE RIGHTS
+~   CONTAINED HERE IN CONSIDERATION OF YOUR ACCEPTANCE OF SUCH TERMS AND CONDITIONS.
+~
+~ The complete license is available at https://creativecommons.org/licenses/by/3.0/legalcode
+-->
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Water level over time</title>
+    <!-- including ECharts file -->
+    <link rel="stylesheet" href="../css/cyprus-water.css">
+    <script src="../js/echarts.min.js"></script>
+</head>
+<body>
+
+<p class="title">Cyprus Water</p>
+
+<div id="graph" style="width: 100%;height:800px;"></div>
+
+<p>Stacked area graph of the share of each dam compared to the total water reserves, over time</p>
+
+<script>
+
+    let data;
+
+    function updateGraph() {
+        let dams = data.dams;
+        let percentages = data.percentages;
+
+        let damCapacities = {};
+        dams.forEach(function(dam) {
+            damCapacities[dam.nameEn] = 1.0 * dam.capacity / 1000000;
+        });
+
+        let timestamps = Object.keys(percentages);
+        let x = {};
+        for(let i in timestamps) {
+            let timestamp = timestamps[i];
+            x[timestamp] = new Date(timestamp); // convert to JSON timestamp
+        }
+
+        let damNames = Object.keys(percentages[timestamps[0]].damNamesToPercentage);
+
+        let totals = {};
+        timestamps.forEach(function(timestamp) {
+            let total = 0;
+            damNames.forEach(function(dam) {
+                let damPercentage = percentages[timestamp].damNamesToPercentage[dam];
+                let damQuantity = damPercentage * damCapacities[dam];
+                total += damQuantity;
+            });
+            totals[timestamp] = total;
+        });
+
+        let damsToTimeSeries = {}; // init empty dictionary
+        damNames.forEach(function(dam) {
+            let damTimeSeries = [];
+            timestamps.forEach(function(timestamp) {
+                let timestampAsDate = x[timestamp];
+                let currentLevel = percentages[timestamp].damNamesToPercentage[dam] * damCapacities[dam];
+                let percentageFull = percentages[timestamp].damNamesToPercentage[dam] * 100;
+                let percentageOfAll = currentLevel / totals[timestamp];
+                let damEntry = [timestampAsDate, percentageOfAll, percentageFull];
+                damTimeSeries.push(damEntry);
+            });
+            damsToTimeSeries[dam] = damTimeSeries;
+        });
+
+        // based on prepared DOM, initialize echarts instance
+        var myChart = echarts.init(document.getElementById('graph'));
+
+        option = {
+            title: {
+                text: 'Share of each dam compared to the total water reserves'
+            },
+            tooltip : {
+                trigger: 'axis',
+                size: ' ',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                },
+                formatter: function(params) {
+                    let date = new Date(params[0].data[0]);
+                    let month = date.getMonth() + 1;
+                    let day = date.getDay();
+                    let dateFormatted = date.getFullYear() + (month < 10 ? "-0" : "-") + month + (day < 10 ? "-0" : "-") + day;
+
+                    let tooltipHtml = '<b>' + dateFormatted + '</b><br/>';
+                    tooltipHtml += '<table border="0">';
+                    let totalQuantity = 0;
+                    let totalCapacity = 0;
+                    params.forEach(function(c) {
+                        let quantity = c.data[1];
+                        // tooltipHtml += '<span style="color:#ffffff; text-shadow: 1px 1px ' + c.color + '">' + c.seriesName + ': ' + quantity + '</span><br/>';
+                        let damName = c.seriesName;
+                        let capacity = damCapacities[damName];
+                        let percentage = damsToTimeSeries[damName][c.dataIndex][2];
+                        // tooltipHtml += c.marker + ' ' + damName + ': ' + quantity + ' of ' + capacity + ' (' + percentage + '%)<br/>';
+                        tooltipHtml += '<tr><td align="right">' + damName + '</td><td>' + c.marker + '</td><td>' + (quantity * 100).toFixed(1) + '% of total </td><td>with quantity</td><td align="right">' + capacity.toFixed(1) + '</td><td align="right">(<i>' + percentage.toFixed(1) + '%</i>)</td></tr>';
+                        totalQuantity += Number(quantity);
+                        totalCapacity += capacity;
+                    });
+                    let totalPercentage = totalQuantity / totalCapacity * 100;
+                    tooltipHtml += '<tr><td align="right"><b>TOTAL</b></td><td></td><td><b>' + totalQuantity.toFixed(1) + '</b></td><td><b>of</b></td><td align="right"><b>' + totalCapacity.toFixed(1) + '</b></td><td align="right"><b>(<i>' + totalPercentage.toFixed(1) + '%</i>)</b></td></tr>';
+                    let total = 'tbd';
+                    tooltipHtml += '</table>';
+                    return tooltipHtml;
+                }
+            },
+            legend: {
+                data: dams
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {
+                        show: true,
+                        // Show the title when mouse focus
+                        title: 'Download as picture',
+                        name: 'cyprus-water.appspot.com'
+                    }
+                },
+                right: "50px"
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            calculable: true,
+            xAxis : [
+                {
+                    type : 'time',
+                    boundaryGap : false,
+                    axisLabel: {
+                        formatter: (function(value){
+                            let date = new Date(value);
+                            let month = date.getMonth() + 1;
+                            let day = date.getDay();
+                            return date.getFullYear() + (month < 10 ? "-0" : "-") + month + (day < 10 ? "-0" : "-") + day;
+                        })
+                    }
+                }
+            ],
+            yAxis : {},
+            series : [
+                {
+                    name:'Kouris',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Kouris']
+                },
+                {
+                    name:'Asprokremmos',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Asprokremmos']
+                },
+                {
+                    name:'Evretou',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Evretou']
+                },
+                {
+                    name:'Kannaviou',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Kannaviou']
+                },
+                {
+                    name:'Kalavasos',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Kalavasos']
+                },
+                {
+                    name:'Dipotamos',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Dipotamos']
+                },
+                {
+                    name:'Lefkara',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Lefkara']
+                },
+                {
+                    name:'Germasoyeia',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Germasoyeia']
+                },
+                {
+                    name:'Achna',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Achna']
+                },
+                {
+                    name:'Arminou',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Arminou']
+                },
+                {
+                    name:'Polemidia',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Polemidia']
+                },
+                {
+                    name:'Mavrokolympos',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Mavrokolympos']
+                },
+                {
+                    name:'Vyzakia',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Vyzakia']
+                },
+                {
+                    name:'Xyliatos',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Xyliatos']
+                },
+                {
+                    name:'Argaka',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Argaka']
+                },
+                {
+                    name:'Pomos',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Pomos']
+                },
+                {
+                    name:'Kalopanagiotis',
+                    type:'line',
+                    stack: 'Dams',
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Kalopanagiotis']
+                },
+
+
+                {
+                    name:'Total',
+                    type:'line',
+                    stack: 'Dams',
+                    label: {
+                        normal: {
+                            show: true,
+                            position: 'top'
+                        }
+                    },
+                    areaStyle: {normal: {}},
+                    data: damsToTimeSeries['Total']
+                }
+            ],
+            dataZoom: [
+                {
+                    type: 'inside'
+                },
+                {
+                    show: true,
+                    type: 'slider',
+                    startValue: x[0],
+                    end: 100,
+                    minValueSpan: 10
+                }
+            ]
+
+        };
+
+        // use configuration item and data specified to show chart
+        myChart.setOption(option);
+    }
+
+    // execute initially (once) to get data
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState === 4 && this.status === 200) {
+            // set the current dam level
+            data = JSON.parse(this.responseText);
+            updateGraph();
+        }
+    };
+    xhttp.open("GET", "https://cyprus-water.appspot.com/api/timeseries", true);
+    xhttp.send();
+
+
+</script>
+
+</body>
+</html>

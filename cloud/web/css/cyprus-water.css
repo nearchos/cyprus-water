@@ -48,6 +48,13 @@ body {
     margin-top: 1em;
 }
 
+.graph {
+    border: #44CC447F;
+    border-style: dashed;
+    border-width: 2px;
+    margin-top: 1em;
+}
+
 .link-to-github {
     color: #3f3f3f;
     font-size: 14px;

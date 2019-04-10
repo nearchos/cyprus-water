@@ -218,12 +218,37 @@
 
 <p class="section">Graphs</p>
 
-<section>
-    <article>
-        <p>Timeseries graph, showing the water level across the main reservoirs over time.</p>
-        <p><a href="/graphs/timeseries" target="_blank">/graphs/timeseries</a></p>
-    </article>
-</section>
+<div class="graph">
+    <p class="question">/graphs/timeseries</p>
+    <p class="answer">Timeseries graph, showing the water level across the main reservoirs over time.</p>
+
+    <div class="input-group">
+        <div class="input-group-button">
+            <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/graphs/timeseries','_blank');">
+                Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
+            </button>
+        </div>
+        <div class="html hljs snippet" id="graph_timeseries">
+            <code>https://cyprus-water.appspot.com/graphs/timeseries</code>
+        </div>
+    </div>
+</div>
+
+<div class="graph">
+    <p class="question">/graphs/shares</p>
+    <p class="answer">Timeseries graph, showing the share of each dam compared to the overall water reserves, over time.</p>
+
+    <div class="input-group">
+        <div class="input-group-button">
+            <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/graphs/shares','_blank');">
+                Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
+            </button>
+        </div>
+        <div class="html hljs snippet" id="graph_shares">
+            <code>https://cyprus-water.appspot.com/graphs/shares</code>
+        </div>
+    </div>
+</div>
 
 <!--#about-->
 <a name="about"></a>
