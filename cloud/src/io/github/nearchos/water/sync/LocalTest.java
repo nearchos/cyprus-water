@@ -25,13 +25,15 @@ public class LocalTest {
     public static final String TEST_URL_2018_10_04 = "http://www.moa.gov.cy/moa/wdd/wdd.nsf/all/393B6248A8F87D91C22581CD002D5DAB/$file/2-10-2018GR.xls?openelement";
     public static final String TEST_URL_2018_12_20 = "http://www.moa.gov.cy/moa/wdd/wdd.nsf/393B6248A8F87D91C22581CD002D5DAB/$file/20-12-2018GR.xls";
     public static final String TEST_URL_2019_01_21 = "http://www.moa.gov.cy/moa/wdd/wdd.nsf/393B6248A8F87D91C22581CD002D5DAB/$file/21-1-2019GR.xls";
+    public static final String TEST_URL_2019_05_06 = "http://www.moa.gov.cy/moa/wdd/wdd.nsf/All/64DF56490CB9CA5CC225838B003F2424/$file/6-MAY-2019 GR.xlsx?OpenElement";
 
     public static void main(String[] args) {
 //        testPOI_XLSX(TEST_URL_2018_08_16);
 //        testPOI_XLSX(TEST_URL_2018_08_31);
 //        testPOI_XLSX(TEST_URL_2018_10_04);
 //        testPOI_XLSX(TEST_URL_2018_12_20);
-        testPOI_XLSX(TEST_URL_2019_01_21);
+//        testPOI_XLSX(TEST_URL_2019_01_21);
+        testPOI_XLSX(TEST_URL_2019_05_06);
     }
 
     private static void testPOI_XLSX(final String url) {

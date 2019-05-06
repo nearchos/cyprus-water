@@ -24,8 +24,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -35,11 +35,20 @@ public class Util {
 
     private enum FileFormat { HSSF, XSSF };
 
-    static Workbook doRequestXls(final String url) throws IOException {
+    static Workbook doRequestXls(final String urlString) throws IOException {
+        final URL url = new URL(urlString);
+        String encodedUrl;
         try {
-            return doRequestXls(url, FileFormat.XSSF);
+            final URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+            encodedUrl = uri.toASCIIString();
+        } catch (URISyntaxException urise) {
+            throw new IOException(urise);
+        }
+
+        try {
+            return doRequestXls(encodedUrl, FileFormat.XSSF);
         } catch (OLE2NotOfficeXmlFileException e) {
-            return doRequestXls(url, FileFormat.HSSF);
+            return doRequestXls(encodedUrl, FileFormat.HSSF);
         }
     }
 
