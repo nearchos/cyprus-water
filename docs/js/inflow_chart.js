@@ -14,7 +14,7 @@ months.forEach((e) => {
 monthsRow.innerHTML = monthRowHTML.join("");
 
 //Adds a row with stats for each years inflow
-function addRow(year, data, container,scale) {
+function addRow(year, data, container, scale) {
     //Add year row
     var newRow = document.createElement('div');
     newRow.classList.add('year-row');

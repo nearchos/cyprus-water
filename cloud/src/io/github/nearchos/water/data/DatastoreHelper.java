@@ -34,6 +34,13 @@ public class DatastoreHelper {
     public static final String PROPERTY_SCORE_NICKNAME = "score-nickname";
     public static final String PROPERTY_SCORE_SCORE = "score-score";
     public static final String PROPERTY_SCORE_DATE = "score-date";
+    public static final String KIND_EVENT = "event";
+    public static final String PROPERTY_EVENT_NAME_EN = "event-name-en";
+    public static final String PROPERTY_EVENT_NAME_EL = "event-name-el";
+    public static final String PROPERTY_EVENT_TYPE = "event-type";
+    public static final String PROPERTY_EVENT_DESCRIPTION = "event-description";
+    public static final String PROPERTY_EVENT_FROM = "event-from";
+    public static final String PROPERTY_EVENT_UNTIL = "event-until";
 
     private static final DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
     private static final Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
@@ -127,5 +134,41 @@ public class DatastoreHelper {
         if(sorted) allScores.sort(Score::compareTo);
 
         return allScores;
+    }
+
+    public static void addEvent(final Event event) {
+
+        final Entity eventEntity = new Entity(KIND_EVENT);
+        eventEntity.setProperty(PROPERTY_EVENT_NAME_EN, event.getNameEn());
+        eventEntity.setProperty(PROPERTY_EVENT_NAME_EL, event.getNameEl());
+        eventEntity.setProperty(PROPERTY_EVENT_TYPE, event.getType().name());
+        eventEntity.setProperty(PROPERTY_EVENT_DESCRIPTION, event.getDescription());
+        eventEntity.setProperty(PROPERTY_EVENT_FROM, event.getFrom());
+        eventEntity.setProperty(PROPERTY_EVENT_UNTIL, event.getUntil());
+        datastoreService.put(eventEntity);
+    }
+
+    public static Vector<Event> getAllEvents() {
+
+        final Vector<Event> allEvents = new Vector<>();
+
+        final Query query = new Query(KIND_EVENT)
+                .addSort(PROPERTY_EVENT_FROM, Query.SortDirection.ASCENDING);
+
+        final PreparedQuery preparedQuery = datastoreService.prepare(query);
+
+        log.info("looking up all events");
+
+        for (final Entity eventEntity : preparedQuery.asIterable()) {
+            final String nameEn = (String) eventEntity.getProperty(PROPERTY_EVENT_NAME_EN);
+            final String nameEl = (String) eventEntity.getProperty(PROPERTY_EVENT_NAME_EL);
+            final Event.Type type = Event.Type.valueOf(eventEntity.getProperty(PROPERTY_EVENT_TYPE).toString());
+            final String description  = (String) eventEntity.getProperty(PROPERTY_EVENT_DESCRIPTION);
+            final long from = (Long) eventEntity.getProperty(PROPERTY_EVENT_FROM);
+            final long until = (Long) eventEntity.getProperty(PROPERTY_EVENT_UNTIL);
+            allEvents.add(new Event(nameEn, nameEl, type, description, from, until));
+        }
+
+        return allEvents;
     }
 }

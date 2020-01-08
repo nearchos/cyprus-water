@@ -96,6 +96,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>GetEventsServlet</servlet-name>
+        <servlet-class>io.github.nearchos.water.api.GetEventsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetEventsServlet</servlet-name>
+        <url-pattern>/api/events</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>PostScoreServlet</servlet-name>
         <servlet-class>io.github.nearchos.water.api.PostScoreServlet</servlet-class>
     </servlet>
@@ -142,6 +151,33 @@
         <url-pattern>/api</url-pattern>
         <url-pattern>/guide</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AdminIndex</servlet-name>
+        <jsp-file>/admin/index.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminIndex</servlet-name>
+        <url-pattern>/admin</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AdminEvents</servlet-name>
+        <jsp-file>/admin/events.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminEvents</servlet-name>
+        <url-pattern>/admin/events</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>AddEventServlet</servlet-name>
+        <servlet-class>io.github.nearchos.water.admin.AddEventServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AddEventServlet</servlet-name>
+        <url-pattern>/admin/add-event</url-pattern>
+    </servlet-mapping>
     <!--End of Pages-->
 
     <!--Security constraints-->
@@ -159,6 +195,10 @@
         <web-resource-collection>
             <web-resource-name>cron</web-resource-name>
             <url-pattern>/sync/*</url-pattern>
+        </web-resource-collection>
+        <web-resource-collection>
+            <web-resource-name>admin</web-resource-name>
+            <url-pattern>/admin/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>

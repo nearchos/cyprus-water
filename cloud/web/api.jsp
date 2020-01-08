@@ -168,6 +168,28 @@
     </div>
 </div>
 
+<div class="api_call">
+    <p class="question">/api/events</p>
+    <p class="answer">Queries the stored <i>events</i> throughout time. The query uses the format yyyy-MM-dd
+        (e.g. "?from=2019-12-21" to query the events since December 21st, 2019.
+        If no 'from' or 'to' parameter is specified, the server returns all stored events. The reply is encoded in JSON.</p>
+
+    <div class="input-group">
+        <div class="input-group-button">
+            <span class="link-to-github">Returns an array of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/src/io/github/nearchos/water/data/Event.java" target="_blank">Event</a>s</code></span>
+            <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/api/events?from=2019-12-21','_blank');">
+                Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
+            </button>
+            <button class="btn" data-clipboard-target="#api_data_events" title="Copy to clipboard">
+                Copy <img class="clippy" width="13" src="images/clippy.svg" alt="Copy to clipboard">
+            </button>
+        </div>
+        <div class="html hljs snippet" id="api_data_events">
+            <code>https://cyprus-water.appspot.com/api/events?from=2019-12-21</code>
+        </div>
+    </div>
+</div>
+
 
 <div class="api_call">
     <p class="question">/api/timeseries</p>

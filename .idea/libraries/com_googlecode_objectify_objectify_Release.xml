@@ -1,0 +1,43 @@
+<component name="libraryTable">
+  <library name="com.googlecode.objectify:objectify:Release">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/googlecode/objectify/objectify/6.0.2/objectify-6.0.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/net/spy/spymemcached/2.12.3/spymemcached-2.12.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/cloud/google-cloud-datastore/1.16.0/google-cloud-datastore-1.16.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/cloud/google-cloud-core/1.16.0/google-cloud-core-1.16.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/20.0/guava-20.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/joda-time/joda-time/2.9.2/joda-time-2.9.2.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/http-client/google-http-client/1.23.0/google-http-client-1.23.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpclient/4.0.1/httpclient-4.0.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/httpcomponents/httpcore/4.0.1/httpcore-4.0.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.3/commons-codec-1.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/code/findbugs/jsr305/3.0.1/jsr305-3.0.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/api/api-common/1.2.0/api-common-1.2.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/api/gax/1.17.0/gax-1.17.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/threeten/threetenbp/1.3.3/threetenbp-1.3.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/protobuf/protobuf-java-util/3.5.1/protobuf-java-util-3.5.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.7/gson-2.7.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/api/grpc/proto-google-common-protos/1.0.5/proto-google-common-protos-1.0.5.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/api/grpc/proto-google-iam-v1/0.1.29/proto-google-iam-v1-0.1.29.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/cloud/google-cloud-core-http/1.16.0/google-cloud-core-http-1.16.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/auth/google-auth-library-credentials/0.9.0/google-auth-library-credentials-0.9.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/auth/google-auth-library-oauth2-http/0.9.0/google-auth-library-oauth2-http-0.9.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/oauth-client/google-oauth-client/1.23.0/google-oauth-client-1.23.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/api-client/google-api-client/1.23.0/google-api-client-1.23.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/http-client/google-http-client-appengine/1.23.0/google-http-client-appengine-1.23.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/http-client/google-http-client-jackson/1.23.0/google-http-client-jackson-1.23.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/jackson/jackson-core-asl/1.9.11/jackson-core-asl-1.9.11.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/http-client/google-http-client-jackson2/1.23.0/google-http-client-jackson2-1.23.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.1.3/jackson-core-2.1.3.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/api/gax-httpjson/0.34.0/gax-httpjson-0.34.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/api/grpc/proto-google-cloud-datastore-v1/0.1.29/proto-google-cloud-datastore-v1-0.1.29.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/protobuf/protobuf-java/3.4.0/protobuf-java-3.4.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/cloud/datastore/datastore-v1-proto-client/1.6.0/datastore-v1-proto-client-1.6.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/http-client/google-http-client-protobuf/1.20.0/google-http-client-protobuf-1.20.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
