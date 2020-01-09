@@ -35,6 +35,7 @@ public class GetEventsServlet extends HttpServlet {
         final Vector<Event> allEvents = DatastoreHelper.getAllEvents();
 
         response.setContentType("application/json; charset=utf-8");
+        response.setHeader("Access-Control-Allow-Origin", "*");
         response.getOutputStream().println(gson.toJson(allEvents));
     }
 }

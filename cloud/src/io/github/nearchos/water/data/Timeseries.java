@@ -21,10 +21,14 @@ public class Timeseries {
 
     private final Vector<Dam> dams;
     private final SortedMap<String,DamsPercentage> percentages;
+    private final int numOfDams;
+    private final int numOfPercentageEntries;
 
     public Timeseries(final Vector<Dam> dams, final SortedMap<String, DamsPercentage> percentages) {
         this.dams = dams;
         this.percentages = percentages;
+        this.numOfDams = dams.size();
+        this.numOfPercentageEntries = percentages.size();
     }
 
     public Vector<Dam> getDams() {
@@ -33,5 +37,13 @@ public class Timeseries {
 
     public SortedMap<String, DamsPercentage> getPercentages() {
         return percentages;
+    }
+
+    public int getNumOfDams() {
+        return numOfDams;
+    }
+
+    public int getNumOfPercentageEntries() {
+        return numOfPercentageEntries;
     }
 }

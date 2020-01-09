@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.nearchos.water.api.GetDayStatisticsServlet;
 
+import java.time.*;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -86,6 +87,59 @@ public class DatastoreHelper {
         }
 
         return allDayStatistics;
+    }
+
+    public static Vector<DayStatistics> getSignificantDayStatistics() {
+
+        final Vector<DayStatistics> significantDayStatistics = new Vector<>();
+
+        final Query query = new Query(KIND_DAY_STATISTICS)
+                .addSort(PROPERTY_DAY_STATISTICS_DAY, Query.SortDirection.ASCENDING);
+
+        final PreparedQuery preparedQuery = datastoreService.prepare(query);
+
+        log.info("looking up significant dayStatistics");
+
+        final Vector<Event> events = DatastoreHelper.getAllEvents();
+
+        Date lastDate = null;
+
+        // assert exactly one (or none) is found
+        for (final Entity dayStatisticsEntity : preparedQuery.asIterable()) {
+            final String dayStatisticsJson = (String) dayStatisticsEntity.getProperty(PROPERTY_DAY_STATISTICS_JSON);
+            final DayStatistics dayStatistics = gson.fromJson(dayStatisticsJson, DayStatistics.class);
+            final Date date = dayStatistics.getDate();
+            // get dates which are the first entries of a week or dates which  are parts of 'events'
+            if(lastDate == null || isFirstInWeek(lastDate, date) || isContained(events, date)) {
+                significantDayStatistics.add(dayStatistics);
+                lastDate = date;
+            }
+        }
+        return significantDayStatistics;
+    }
+
+    private static boolean isContained(final Vector<Event> events, final Date date) {
+        final long timestamp = date.getTime();
+        for(final Event event : events) {
+            if(event.getFrom() <= timestamp && timestamp <= event.getUntil()) { // todo make sure this works even with single-day events
+                log.info("Found date: " + date + " is in event: " + event.getNameEn());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if the specified date is a Monday, or >= 7 days since the last reported date
+     * @param lastDate the last reported date
+     * @param date the specified date to be checked
+     * @return true if the specified date is a Monday, or >= 7 days since the last reported date
+     */
+    private static boolean isFirstInWeek(final Date lastDate, final Date date) {
+        final LocalDate lastLocalDate = lastDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        final LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return localDate.getDayOfWeek() == DayOfWeek.MONDAY // date is a Monday
+                || Period.between(lastLocalDate, localDate).getDays() >= 7; // or duration between the two is > 7 days
     }
 
     public static void addDayStatistics(final DayStatistics dayStatistics) {

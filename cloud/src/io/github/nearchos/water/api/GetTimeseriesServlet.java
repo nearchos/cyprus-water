@@ -38,16 +38,26 @@ public class GetTimeseriesServlet extends HttpServlet {
         response.setContentType("application/json; charset=utf-8");
         response.setHeader("Access-Control-Allow-Origin", "*");
 
+        final boolean all = request.getParameter("all") != null;
+
         // first check if in memcache
         final String memcacheKey = "timeseries-" + DayStatistics.SIMPLE_DATE_FORMAT.format(new Date());
-        if (memcacheService.contains(memcacheKey)) {
+        final String memcacheKeyAll = "timeseries-all-" + DayStatistics.SIMPLE_DATE_FORMAT.format(new Date());
+
+        if(all && memcacheService.contains(memcacheKeyAll)) {
+            final String reply = (String) memcacheService.get(memcacheKeyAll);
+            // return the cached result as JSON
+            response.getWriter().println(reply);
+        } else if(!all && memcacheService.contains(memcacheKey)) {
             final String reply = (String) memcacheService.get(memcacheKey);
             // return the cached result as JSON
             response.getWriter().println(reply);
         } else {
             // produce a new result, then cache it, and finally return it
             final Vector<Dam> dams = DatastoreHelper.getDams();
-            final Vector<DayStatistics> dayStatisticsVector = DatastoreHelper.getAllDayStatistics();
+            final Vector<DayStatistics> dayStatisticsVector = all ?
+                    DatastoreHelper.getAllDayStatistics() :
+                    DatastoreHelper.getSignificantDayStatistics();
             final SortedMap<String, DamsPercentage> percentages = new TreeMap<>();
             for (final DayStatistics dayStatistics : dayStatisticsVector) {
                 percentages.put(dayStatistics.getDateAsString(), new DamsPercentage(dayStatistics));
@@ -58,7 +68,7 @@ public class GetTimeseriesServlet extends HttpServlet {
             final String reply = gson.toJson(timeseries);
 
             // cache the result
-            memcacheService.put(memcacheKey, reply);
+            memcacheService.put(all ? memcacheKeyAll : memcacheKey, reply);
 
             // return the result
             response.getWriter().println(reply);

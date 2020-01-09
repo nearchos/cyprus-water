@@ -19,8 +19,8 @@
     <link rel="stylesheet" href="css/cyprus-water.css">
     <link rel="stylesheet" href="css/slider.css">
     <script src="https://cdn.rawgit.com/zenorocha/clipboard.js/v2.0.0/dist/clipboard.min.js"></script>
-    <script src="https://d3js.org/d3.v3.min.js" language="JavaScript"></script>
-    <script src="js/liquidFillGauge.js" language="JavaScript"></script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="js/liquidFillGauge.js"></script>
     <script src="js/dams.js"></script>
 </head>
 
@@ -55,9 +55,17 @@
         <input id="keepAspectCheckbox" title="Toggle proportional drawing mode" type="checkbox" onclick="drawDamPercentagesWithAspect()" />
         Size bars according to dam capacity
     </p>
+
+    <canvas id="myGraph" width="960" height="100" style="border:1px solid #d3d3d3;">Your browser does not support the HTML5 canvas tag.</canvas>
+
+    <p>
+        <input id="showEventsCheckbox" title="Toggle events visibility" type="checkbox" onclick="showEvents()" />
+        Show events (overflow and weather systems)
+    </p>
+
     <p>
         Showing data for <span id="selectedDateSpan">01/01/2019</span>
-        <input type="range" min="1" max="1" value="1" class="slider" id="dateSelector">
+        <label><input type="range" min="1" max="1" value="1" class="slider" id="dateSelector"></label>
         <div class="sliderticks" id="rangeTicks"></div>
     </p>
     <p style="text-align: center; color: #3333ff; font-weight: bold;">Water level in main reservoirs in Cyprus</p>
@@ -172,7 +180,7 @@
 <div class="api_call">
     <p class="question">/api/timeseries</p>
     <p class="answer">Queries the <i>timeseries</i> of the water level through time. The query returns a
-        Timeseries object containing basic info of the dams, plus an ordered array of dates to percentagesThe reply is encoded in JSON.</p>
+        Timeseries object containing basic info of the dams, plus an ordered array of dates to percentages. The reply is encoded in JSON.</p>
 
     <div class="input-group">
         <div class="input-group-button">
@@ -293,6 +301,7 @@
 
     let percentages = {};
     let availableDates = [];
+    let dayToCapacity = [];
 
     let slider = document.getElementById("dateSelector");
     let sliderTicks = document.getElementById("rangeTicks");
@@ -302,6 +311,7 @@
         selectedDateSpan.innerText = getFormattedDate(availableDates[slider.value]);
         // update graph
         drawDamPercentagesWithAspect();
+        drawGraph();
     };
 
     function loadTimeseries() {
@@ -309,7 +319,7 @@
         xhttp.onreadystatechange = function() {
             if (this.readyState === 4 && this.status === 200) {
                 // set the current dam level
-                timeseries = JSON.parse(this.responseText);
+                let timeseries = JSON.parse(this.responseText);
                 percentages = timeseries.percentages;
                 //update date selector
                 let datesWithData = Object.keys(percentages);
@@ -364,9 +374,88 @@
         return date.getFullYear() + "-" + (month < 10 ? '0' : '') + month + '-' + (day < 10 ? '0' : '') + day;
     }
 
+    // Draw dam wih levels
+    function drawGraph() {
+        let selectedDate = availableDates[slider.value];
+
+        let firstDate = availableDates[0];
+        let lastDate = availableDates[availableDates.length-1];
+        let numOfDaysCovered = (lastDate - firstDate) / (1000 * 60 * 60 * 24);
+        let percentages = getPercentagesForDate(firstDate);
+        let totalCapacityInMCM = percentages["totalCapacityInMCM"];
+
+        if(dayToCapacity.length === 0) {
+            for(const date of availableDates) {
+                let percentages = getPercentagesForDate(date);
+                // console.log(date + " -> " + percentages["totalPercentage"] + "% of total capacity " + percentages["totalCapacityInMCM"] + "MCM")
+                let day = (date - firstDate) / (1000 * 60 * 60 * 24);
+                dayToCapacity[day] = percentages["totalPercentage"];
+            }
+            let lastValue = dayToCapacity[0];
+            for(let i = 0; i < dayToCapacity.length; i++) {
+                if(dayToCapacity[i] === undefined) {
+                    dayToCapacity[i] = lastValue;
+                } else {
+                    lastValue = dayToCapacity[i];
+                }
+            }
+        }
+
+        // draw graph
+        let canvas = document.getElementById("myGraph");
+        let ctx = canvas.getContext("2d");
+        let height = canvas.height;
+        let width = canvas.width;
+        console.log("width: " + width + ", height: " + height);
+
+        let x_pixels_per_day = width / numOfDaysCovered;
+        let y_pixels_per_MCM = height / totalCapacityInMCM;
+
+        let x = 0;
+        let y = height - percentages["totalPercentage"] * totalCapacityInMCM;
+
+        ctx.clearRect(0, 0, width, height);
+        ctx.beginPath();
+
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'black';
+        ctx.moveTo(x, y);
+
+        for(let day = 0; day < dayToCapacity.length; day++) {
+            if(day === 0) continue; // skip first date in the loop as it was covered right before it
+
+            let x = day * x_pixels_per_day;
+            let y = height - (dayToCapacity[day] * totalCapacityInMCM * y_pixels_per_MCM);
+
+            ctx.lineTo(x, y);
+            ctx.moveTo(x, y);
+            ctx.stroke();
+        }
+
+        let x_day = (selectedDate - firstDate) / (1000 * 60 * 60 * 24);
+        x = x_day * x_pixels_per_day;
+        ctx.strokeStyle = 'red';
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+    }
+
+    function loadEvents() {
+        fetch('https://cyprus-water.appspot.com/api/events')
+            .then(response => response.json())
+            .then(json => {
+                console.log('json events: ' + JSON.stringify(json)); // todo
+        });
+    }
+
+    function showEvents() {
+        console.log('show events... ' + showEventsCheckbox.checked);
+    }
+
     function init() {
         loadTimeseries();
         // loadDamsPercentage();
+        loadEvents();
     }
 
     init();

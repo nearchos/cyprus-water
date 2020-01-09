@@ -194,7 +194,7 @@
 <div class="api_call">
     <p class="question">/api/timeseries</p>
     <p class="answer">Queries the <i>timeseries</i> of the water level through time. The query returns a
-        Timeseries object containing basic info of the dams, plus an ordered array of dates to percentagesThe reply is encoded in JSON.</p>
+        Timeseries object containing basic info of the dams, plus an ordered array of dates to percentages. The reply is encoded in JSON.</p>
 
     <div class="input-group">
         <div class="input-group-button">
