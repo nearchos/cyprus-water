@@ -64,26 +64,4 @@ public class MonthlyInflow implements Serializable {
                 ", inflowInMCM=" + inflowInMCM +
                 '}';
     }
-
-    public static boolean inThePresent(final MonthlyInflow monthlyInflow) {
-        final LocalDate localDate = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        final int yearNow = localDate.getYear();
-        final int monthValueNow = localDate.getMonthValue(); // 1..12
-        final int periodOrdinal = monthlyInflow.getPeriod().ordinal();
-        final int correspondingMonthValue = periodOrdinal < 3 ? periodOrdinal + 11 : periodOrdinal - 2; // 1..12
-        return monthlyInflow.year == yearNow && correspondingMonthValue == monthValueNow;
-    }
-
-    public static boolean inThePastOrPresent(final MonthlyInflow monthlyInflow) {
-        final LocalDate localDate = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        final int yearNow = localDate.getYear();
-        final int monthValueNow = localDate.getMonthValue(); // 1..12
-        final int periodOrdinal = monthlyInflow.getPeriod().ordinal();
-        final int correspondingMonthValue = periodOrdinal < 3 ? periodOrdinal + 11 : periodOrdinal - 2; // 1..12
-        return monthlyInflow.year < yearNow || (monthlyInflow.year == yearNow && correspondingMonthValue <= monthValueNow);
-    }
-
-    public static boolean inTheFuture(final MonthlyInflow monthlyInflow) {
-        return !inThePastOrPresent(monthlyInflow);
-    }
 }

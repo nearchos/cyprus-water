@@ -1,23 +1,99 @@
 package io.github.nearchos.water.api;
 
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.github.nearchos.water.data.DatastoreHelper;
+import io.github.nearchos.water.data.DayStatistics;
+import io.github.nearchos.water.data.MonthlyInflow;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.ZoneId;
+import java.util.*;
 
 public class GetHistoricInflowServlet extends HttpServlet {
 
+    private static final MonthlyInflow.Period [] orderedPeriods = {
+            MonthlyInflow.Period.JANUARY,
+            MonthlyInflow.Period.FEBRUARY,
+            MonthlyInflow.Period.MARCH,
+            MonthlyInflow.Period.APRIL,
+            MonthlyInflow.Period.MAY,
+            MonthlyInflow.Period.JUNE,
+            MonthlyInflow.Period.JULY,
+            MonthlyInflow.Period.AUGUST_AND_SEPTEMBER,
+            MonthlyInflow.Period.OCTOBER,
+            MonthlyInflow.Period.NOVEMBER,
+            MonthlyInflow.Period.DECEMBER
+    };
+
     private static final Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private final MemcacheService memcacheService = MemcacheServiceFactory.getMemcacheService();
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json; charset=utf-8");
         response.setHeader("Access-Control-Allow-Origin", "*");
 
-        response.getWriter().println(DEFAULT_HISTORIC_INFLOW);
+        final String reply;
+        final String memcacheKey = "historical-inflow-" + DayStatistics.SIMPLE_DATE_FORMAT.format(new Date());
+        if(memcacheService.contains(memcacheKey)) {
+            reply = (String) memcacheService.get(memcacheKey);
+        } else {
+
+            final Vector<MonthlyInflow> allMonthlyInflows = DatastoreHelper.getAllMonthlyInflows();
+
+            final Map<String, List<Double>> historicInflow = getHistoricInflow(allMonthlyInflows);
+
+            reply = gson.toJson(historicInflow);
+            memcacheService.put(memcacheKey, reply);
+        }
+
+        response.getWriter().println(reply);
+    }
+
+    private Map<String, List<Double>> getHistoricInflow(final Vector<MonthlyInflow> allMonthlyInflows) {
+
+        final Map<String, List<Double>> historicInflow = (Map<String, List<Double>>) gson.fromJson(DEFAULT_HISTORIC_INFLOW, Map.class);
+
+        allMonthlyInflows.sort((monthlyInflowLeft, monthlyInflowRight) -> {
+            final int monthIndexLeft = monthlyInflowLeft.getPeriod().ordinal() < 3 ? monthlyInflowLeft.getPeriod().ordinal() + 10 : monthlyInflowLeft.getPeriod().ordinal() - 3;
+            final int monthIndexRight = monthlyInflowRight.getPeriod().ordinal() < 3 ? monthlyInflowRight.getPeriod().ordinal() + 10 : monthlyInflowRight.getPeriod().ordinal() - 3;
+            return monthlyInflowLeft.getYear() == monthlyInflowRight.getYear() ?
+                    monthIndexLeft - monthIndexRight :
+                    monthlyInflowLeft.getYear() - monthlyInflowRight.getYear();
+        });
+
+        final int yearNow = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getYear();
+        for(int year = 2019; year <= yearNow; year++) {
+            final List<Double> values = new Vector<>();
+            boolean found = false;
+            for(final MonthlyInflow.Period period : orderedPeriods) {
+                // get selected monthly inflow
+                for(final MonthlyInflow monthlyInflow : allMonthlyInflows) {
+                    if(monthlyInflow.getYear() == year && monthlyInflow.getPeriod() == period) { // found
+                        if(period == MonthlyInflow.Period.AUGUST_AND_SEPTEMBER) {
+                            values.add(monthlyInflow.getInflowInMCM() / 2d); // add as 2 months, half the inflow
+                            values.add(monthlyInflow.getInflowInMCM() / 2d);
+                        } else {
+                            values.add(monthlyInflow.getInflowInMCM()); // else add normally
+                        }
+                        found = true; // either eay it was found
+                    }
+                }
+                if(!found) {
+                    // terminate loop
+                    break;
+                }
+            }
+            historicInflow.put(Integer.toString(year), values);
+        }
+
+        return historicInflow;
     }
 
     public static final String DEFAULT_HISTORIC_INFLOW =
@@ -32,7 +108,6 @@ public class GetHistoricInflowServlet extends HttpServlet {
             "  \"2015\": [38.354, 44.515, 17.669, 8.233, 3.137, 0.976, 0.091, 0.003, 0.004, 1.024, 0.608, 1.248 ],\n" +
             "  \"2016\": [3.685, 2.824, 6.132, 1.314, 0.961, 0.105, 0, 0.003, 0.003, 0.247, 0.657, 7.424 ],\n" +
             "  \"2017\": [21.083, 4.181, 8.891, 4.398, 1.78, 0.228, 0, 0, 0, 0.142, 0.614, 0.881 ],\n" +
-            "  \"2018\": [20.661, 9.528, 5.944, 2.176, 2.802, 2.022, 0.05, 0.038, 0.039, 0.858, 0.757, 16.665 ],\n" +
-            "  \"2019\": [118.110, 53.909, 32.283 ]\n" +
+            "  \"2018\": [20.661, 9.528, 5.944, 2.176, 2.802, 2.022, 0.05, 0.038, 0.039, 0.858, 0.757, 16.665 ]\n" +
             "}";
 }

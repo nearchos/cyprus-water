@@ -20,7 +20,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.nearchos.water.data.DatastoreHelper;
 import io.github.nearchos.water.data.DayStatistics;
-import io.github.nearchos.water.data.Event;
 import io.github.nearchos.water.data.MonthlyInflow;
 
 import javax.servlet.ServletException;
@@ -28,8 +27,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Vector;
 
@@ -39,10 +36,15 @@ public class GetMonthlyInflowsServlet extends HttpServlet {
 
     private final MemcacheService memcacheService = MemcacheServiceFactory.getMemcacheService();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+        response.setContentType("application/json; charset=utf-8");
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.getOutputStream().println(getReply());
+    }
+
+    String getReply() {
         final String reply;
-
         final String memcacheKey = "monthly-inflows-" + DayStatistics.SIMPLE_DATE_FORMAT.format(new Date());
         if(memcacheService.contains(memcacheKey)) {
             reply = (String) memcacheService.get(memcacheKey);
@@ -59,8 +61,6 @@ public class GetMonthlyInflowsServlet extends HttpServlet {
             memcacheService.put(memcacheKey, reply);
         }
 
-        response.setContentType("application/json; charset=utf-8");
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.getOutputStream().println(reply);
+        return reply;
     }
 }
