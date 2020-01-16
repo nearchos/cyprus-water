@@ -16,6 +16,7 @@ package io.github.nearchos.water.data;
 
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.apphosting.api.DatastorePb;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.nearchos.water.api.GetDayStatisticsServlet;
@@ -42,6 +43,11 @@ public class DatastoreHelper {
     public static final String PROPERTY_EVENT_DESCRIPTION = "event-description";
     public static final String PROPERTY_EVENT_FROM = "event-from";
     public static final String PROPERTY_EVENT_UNTIL = "event-until";
+    public static final String KIND_MONTHLY_INFLOW = "monthly-inflow";
+    public static final String PROPERTY_MONTHLY_INFLOW_TIMESTAMP = "monthly-inflow-timestamp";
+    public static final String PROPERTY_MONTHLY_INFLOW_YEAR = "monthly-inflow-year";
+    public static final String PROPERTY_MONTHLY_INFLOW_PERIOD = "monthly-inflow-period";
+    public static final String PROPERTY_MONTHLY_INFLOW_VALUE = "monthly-inflow-value";
 
     private static final DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
     private static final Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
@@ -110,7 +116,7 @@ public class DatastoreHelper {
             final DayStatistics dayStatistics = gson.fromJson(dayStatisticsJson, DayStatistics.class);
             final Date date = dayStatistics.getDate();
             // get dates which are the first entries of a week or dates which  are parts of 'events'
-            if(lastDate == null || isFirstInWeek(lastDate, date) || isContained(events, date)) {
+            if(lastDate == null || isFirstInWeek(lastDate, date) || isContained(events, date) || isInLastDays(7, date)) {
                 significantDayStatistics.add(dayStatistics);
                 lastDate = date;
             }
@@ -121,7 +127,7 @@ public class DatastoreHelper {
     private static boolean isContained(final Vector<Event> events, final Date date) {
         final long timestamp = date.getTime();
         for(final Event event : events) {
-            if(event.getFrom() <= timestamp && timestamp <= event.getUntil()) { // todo make sure this works even with single-day events
+            if(event.getFrom() <= timestamp && timestamp <= event.getUntil()) {
                 log.info("Found date: " + date + " is in event: " + event.getNameEn());
                 return true;
             }
@@ -140,6 +146,18 @@ public class DatastoreHelper {
         final LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return localDate.getDayOfWeek() == DayOfWeek.MONDAY // date is a Monday
                 || Period.between(lastLocalDate, localDate).getDays() >= 7; // or duration between the two is > 7 days
+    }
+
+    /**
+     * Returns true if the specified date is within numOfDays of today, e.g. in the last week for numOfDays=7.
+     * @param numOfDays how many days back to check
+     * @param date the specified date to be checked
+     * @return true if the specified date is within numOfDays of today
+     */
+    private static boolean isInLastDays(final int numOfDays, final Date date) {
+        final LocalDate today = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        final LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return Period.between(localDate, today).getDays() <= numOfDays;
     }
 
     public static void addDayStatistics(final DayStatistics dayStatistics) {
@@ -224,5 +242,51 @@ public class DatastoreHelper {
         }
 
         return allEvents;
+    }
+
+    public static void addMonthlyInflow(final MonthlyInflow monthlyInflow) {
+
+        final Entity monthlyInflowEntity = new Entity(KIND_MONTHLY_INFLOW);
+        monthlyInflowEntity.setProperty(PROPERTY_MONTHLY_INFLOW_TIMESTAMP, monthlyInflow.getTimestamp());
+        monthlyInflowEntity.setProperty(PROPERTY_MONTHLY_INFLOW_YEAR, monthlyInflow.getYear());
+        monthlyInflowEntity.setProperty(PROPERTY_MONTHLY_INFLOW_PERIOD, monthlyInflow.getPeriod().name());
+        monthlyInflowEntity.setProperty(PROPERTY_MONTHLY_INFLOW_VALUE, monthlyInflow.getInflowInMCM());
+        datastoreService.put(monthlyInflowEntity);
+    }
+
+    public static Vector<MonthlyInflow> getAllMonthlyInflows() {
+
+        final Vector<MonthlyInflow> allMonthlyInflows = new Vector<>();
+
+        final Query query = new Query(KIND_MONTHLY_INFLOW);
+
+        final PreparedQuery preparedQuery = datastoreService.prepare(query);
+
+        log.info("looking up all monthly inflows");
+
+        for (final Entity monthlyInflowEntity : preparedQuery.asIterable()) {
+            final long timestamp = (Long) monthlyInflowEntity.getProperty(PROPERTY_MONTHLY_INFLOW_TIMESTAMP);
+            final long year = (Long) monthlyInflowEntity.getProperty(PROPERTY_MONTHLY_INFLOW_YEAR);
+            final MonthlyInflow.Period period = MonthlyInflow.Period.valueOf(monthlyInflowEntity.getProperty(PROPERTY_MONTHLY_INFLOW_PERIOD).toString());
+            final Double inflowInMCM  = (Double) monthlyInflowEntity.getProperty(PROPERTY_MONTHLY_INFLOW_VALUE);
+            allMonthlyInflows.add(new MonthlyInflow(timestamp, (int) year, period, inflowInMCM));
+        }
+
+        return allMonthlyInflows;
+    }
+
+    public static void updateMonthlyInflow(final MonthlyInflow monthlyInflow) {
+        final Query query = new Query(KIND_MONTHLY_INFLOW);
+        query.setFilter(new Query.CompositeFilter(Query.CompositeFilterOperator.AND, Arrays.asList(
+            new Query.FilterPredicate(PROPERTY_MONTHLY_INFLOW_YEAR, Query.FilterOperator.EQUAL, monthlyInflow.getYear()),
+            new Query.FilterPredicate(PROPERTY_MONTHLY_INFLOW_PERIOD, Query.FilterOperator.EQUAL, monthlyInflow.getPeriod().name())
+        )));
+
+        final Entity monthlyInflowEntity = datastoreService.prepare(query).asSingleEntity();
+        assert monthlyInflowEntity != null;
+        monthlyInflowEntity.setProperty(PROPERTY_MONTHLY_INFLOW_TIMESTAMP, System.currentTimeMillis());
+        monthlyInflowEntity.setProperty(PROPERTY_MONTHLY_INFLOW_VALUE, monthlyInflow.getInflowInMCM());
+
+        datastoreService.put(monthlyInflowEntity);
     }
 }

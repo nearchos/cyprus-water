@@ -19,6 +19,7 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.gson.Gson;
 import io.github.nearchos.water.data.DatastoreHelper;
 import io.github.nearchos.water.data.DayStatistics;
+import io.github.nearchos.water.data.MonthlyInflow;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 public class GrabServlet extends HttpServlet {
@@ -71,7 +73,8 @@ public class GrabServlet extends HttpServlet {
         log("fetching XLS from absoluteLink: "  + absoluteLink);
 
         // fetching and processing XLS
-        final DayStatistics dayStatistics = getDayStatistics(absoluteLink);
+        final org.apache.poi.ss.usermodel.Workbook workbook = getWorkbook(absoluteLink);
+        final DayStatistics dayStatistics = getDayStatistics(workbook);
         final String date = dayStatistics.getDateAsString();
 
         // check if given object is already in datastore - if non-null, then set date already exists in datastore
@@ -85,14 +88,74 @@ public class GrabServlet extends HttpServlet {
             final String memcacheKey = "timeseries-" + DayStatistics.SIMPLE_DATE_FORMAT.format(new Date());
             memcacheService.delete(memcacheKey);
         } else {
-            printWriter.println("Skipped as dayStatistics already in datastore for: " + date);
+            printWriter.println("Skipped as dayStatistics already in datastore for: " + date + "<br>");
+            log("Skipped as dayStatistics already in datastore for: " + date);
+        }
+
+        final Vector<MonthlyInflow> monthlyInflows = getMonthlyInflows(workbook);
+
+        // add all monthly inflows that are missing or that were updated
+        final Vector<MonthlyInflow> existingMonthlyInflows = DatastoreHelper.getAllMonthlyInflows();
+
+        boolean modified = false;
+        for(final MonthlyInflow monthlyInflow : monthlyInflows) {
+            final MonthlyInflow existingMonthlyInflow = getMonthlyInflow(monthlyInflow.getYear(), monthlyInflow.getPeriod(), existingMonthlyInflows);
+            if(existingMonthlyInflow == null) {
+                // add it!
+                DatastoreHelper.addMonthlyInflow(monthlyInflow);
+                modified = true;
+            } else {
+                // update a monthly inflow if modified
+                if(!almostEqual(monthlyInflow.getInflowInMCM(), existingMonthlyInflow.getInflowInMCM())) {
+                    DatastoreHelper.updateMonthlyInflow(monthlyInflow);
+                    modified = true;
+                }
+            }
+        }
+        if(modified) {
+            memcacheService.delete("monthly-inflows-" + DayStatistics.SIMPLE_DATE_FORMAT.format(new Date()));
+        } else {
+            printWriter.println("Skipped as monthlyInflows already in datastore for: " + date + "<br>");
             log("Skipped as dayStatistics already in datastore for: " + date);
         }
     }
 
-    private static DayStatistics getDayStatistics(final String absoluteLink) throws IOException {
-        final org.apache.poi.ss.usermodel.Workbook workbook = Util.doRequestXls(absoluteLink);
+    public static final double EPSILON = 0.000001; // 1 millionth
+
+    private static boolean almostEqual(double a, double b){
+        return Math.abs(a-b) < EPSILON;
+    }
+
+    /**
+     * Check over year/period only (i.e. not value of inflowInMCM)
+     * @param monthlyInflow
+     * @param existingMonthlyInflows
+     * @return
+     */
+    private static boolean isContained(final MonthlyInflow monthlyInflow, final Vector<MonthlyInflow> existingMonthlyInflows) {
+        for(final MonthlyInflow existingMonthlyInflow : existingMonthlyInflows) {
+            if(monthlyInflow.getYear() == existingMonthlyInflow.getYear() && monthlyInflow.getPeriod() == existingMonthlyInflow.getPeriod()) return true;
+        }
+        return false;
+    }
+
+    private static MonthlyInflow getMonthlyInflow(final int year, final MonthlyInflow.Period period, final Vector<MonthlyInflow> existingMonthlyInflows) {
+        for(final MonthlyInflow existingMonthlyInflow : existingMonthlyInflows) {
+            if(year == existingMonthlyInflow.getYear() && period == existingMonthlyInflow.getPeriod()) return existingMonthlyInflow;
+        }
+        return null;
+    }
+
+    private static org.apache.poi.ss.usermodel.Workbook getWorkbook(final String absoluteLink) throws IOException {
+        return Util.doRequestXls(absoluteLink);
+    }
+
+    private static DayStatistics getDayStatistics(final org.apache.poi.ss.usermodel.Workbook workbook) throws IOException {
         return Util.getDayStatistics(workbook);
+    }
+
+    private static Vector<MonthlyInflow> getMonthlyInflows(final org.apache.poi.ss.usermodel.Workbook workbook) throws IOException {
+        return Util.getMonthlyInflows(workbook);
     }
 
     public static void main(String[] args) {
@@ -100,9 +163,13 @@ public class GrabServlet extends HttpServlet {
             final String absoluteLink = getAbsoluteLink();
 
             // fetching and processing XLS
-            final DayStatistics dayStatistics = getDayStatistics(absoluteLink);
+            final org.apache.poi.ss.usermodel.Workbook workbook = getWorkbook(absoluteLink);
+            final DayStatistics dayStatistics = getDayStatistics(workbook);
             final String date = dayStatistics.getDateAsString();
             System.out.println("completed for date -> " + date);
+
+            final Vector<MonthlyInflow> monthlyInflows = getMonthlyInflows(workbook);
+            System.out.println("monthlyInflows -> " + monthlyInflows);
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }

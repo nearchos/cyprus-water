@@ -105,6 +105,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>GetMonthlyInflowsServlet</servlet-name>
+        <servlet-class>io.github.nearchos.water.api.GetMonthlyInflowsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetMonthlyInflowsServlet</servlet-name>
+        <url-pattern>/api/monthly-inflows</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>PostScoreServlet</servlet-name>
         <servlet-class>io.github.nearchos.water.api.PostScoreServlet</servlet-class>
     </servlet>
