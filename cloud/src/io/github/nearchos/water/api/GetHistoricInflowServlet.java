@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder;
 import io.github.nearchos.water.data.DatastoreHelper;
 import io.github.nearchos.water.data.DayStatistics;
 import io.github.nearchos.water.data.MonthlyInflow;
+import io.github.nearchos.water.data.Period;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,18 +18,18 @@ import java.util.*;
 
 public class GetHistoricInflowServlet extends HttpServlet {
 
-    private static final MonthlyInflow.Period [] orderedPeriods = {
-            MonthlyInflow.Period.JANUARY,
-            MonthlyInflow.Period.FEBRUARY,
-            MonthlyInflow.Period.MARCH,
-            MonthlyInflow.Period.APRIL,
-            MonthlyInflow.Period.MAY,
-            MonthlyInflow.Period.JUNE,
-            MonthlyInflow.Period.JULY,
-            MonthlyInflow.Period.AUGUST_AND_SEPTEMBER,
-            MonthlyInflow.Period.OCTOBER,
-            MonthlyInflow.Period.NOVEMBER,
-            MonthlyInflow.Period.DECEMBER
+    private static final Period [] orderedPeriods = {
+            Period.JANUARY,
+            Period.FEBRUARY,
+            Period.MARCH,
+            Period.APRIL,
+            Period.MAY,
+            Period.JUNE,
+            Period.JULY,
+            Period.AUGUST_AND_SEPTEMBER,
+            Period.OCTOBER,
+            Period.NOVEMBER,
+            Period.DECEMBER
     };
 
     private static final Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
@@ -72,11 +73,11 @@ public class GetHistoricInflowServlet extends HttpServlet {
         for(int year = 2019; year <= yearNow; year++) {
             final List<Double> values = new Vector<>();
             boolean found = false;
-            for(final MonthlyInflow.Period period : orderedPeriods) {
+            for(final Period period : orderedPeriods) {
                 // get selected monthly inflow
                 for(final MonthlyInflow monthlyInflow : allMonthlyInflows) {
                     if(monthlyInflow.getYear() == year && monthlyInflow.getPeriod() == period) { // found
-                        if(period == MonthlyInflow.Period.AUGUST_AND_SEPTEMBER) {
+                        if(period == Period.AUGUST_AND_SEPTEMBER) {
                             values.add(monthlyInflow.getInflowInMCM() / 2d); // add as 2 months, half the inflow
                             values.add(monthlyInflow.getInflowInMCM() / 2d);
                         } else {

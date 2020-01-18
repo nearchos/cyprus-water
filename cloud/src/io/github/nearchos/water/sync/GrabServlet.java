@@ -16,10 +16,10 @@ package io.github.nearchos.water.sync;
 
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.google.gson.Gson;
 import io.github.nearchos.water.data.DatastoreHelper;
 import io.github.nearchos.water.data.DayStatistics;
 import io.github.nearchos.water.data.MonthlyInflow;
+import io.github.nearchos.water.data.Period;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -32,13 +32,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 public class GrabServlet extends HttpServlet {
 
-    private static final Logger log = Logger.getLogger("cyprus-water");
+//    private static final Logger log = Logger.getLogger("cyprus-water");
 
-    private static final Gson gson = new Gson();
+//    private static final Gson gson = new Gson();
 
     private final MemcacheService memcacheService = MemcacheServiceFactory.getMemcacheService();
 
@@ -46,7 +45,7 @@ public class GrabServlet extends HttpServlet {
     private static final String WDD_ROOT = "http://www.moa.gov.cy/moa/wdd/wdd.nsf/page18_gr/page18_gr?opendocument";
 
     //    private String DOCUMENT_URL_PREFIX = "http://www.cyprus.gov.cy/moa/wdd/WDD.nsf";
-    private static String DOCUMENT_URL_PREFIX = "http://www.moa.gov.cy/moa/wdd/wdd.nsf";
+//    private static String DOCUMENT_URL_PREFIX = "http://www.moa.gov.cy/moa/wdd/wdd.nsf";
 
     private static String getAbsoluteLink() throws IOException {
         // fetching and parsing root web page
@@ -126,20 +125,20 @@ public class GrabServlet extends HttpServlet {
         return Math.abs(a-b) < EPSILON;
     }
 
-    /**
-     * Check over year/period only (i.e. not value of inflowInMCM)
-     * @param monthlyInflow
-     * @param existingMonthlyInflows
-     * @return
-     */
-    private static boolean isContained(final MonthlyInflow monthlyInflow, final Vector<MonthlyInflow> existingMonthlyInflows) {
-        for(final MonthlyInflow existingMonthlyInflow : existingMonthlyInflows) {
-            if(monthlyInflow.getYear() == existingMonthlyInflow.getYear() && monthlyInflow.getPeriod() == existingMonthlyInflow.getPeriod()) return true;
-        }
-        return false;
-    }
+//    /**
+//     * Check over year/period only (i.e. not value of inflowInMCM)
+//     * @param monthlyInflow
+//     * @param existingMonthlyInflows
+//     * @return
+//     */
+//    private static boolean isContained(final MonthlyInflow monthlyInflow, final Vector<MonthlyInflow> existingMonthlyInflows) {
+//        for(final MonthlyInflow existingMonthlyInflow : existingMonthlyInflows) {
+//            if(monthlyInflow.getYear() == existingMonthlyInflow.getYear() && monthlyInflow.getPeriod() == existingMonthlyInflow.getPeriod()) return true;
+//        }
+//        return false;
+//    }
 
-    private static MonthlyInflow getMonthlyInflow(final int year, final MonthlyInflow.Period period, final Vector<MonthlyInflow> existingMonthlyInflows) {
+    private static MonthlyInflow getMonthlyInflow(final int year, final Period period, final Vector<MonthlyInflow> existingMonthlyInflows) {
         for(final MonthlyInflow existingMonthlyInflow : existingMonthlyInflows) {
             if(year == existingMonthlyInflow.getYear() && period == existingMonthlyInflow.getPeriod()) return existingMonthlyInflow;
         }

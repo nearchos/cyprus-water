@@ -16,7 +16,6 @@ package io.github.nearchos.water.data;
 
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
-import com.google.apphosting.api.DatastorePb;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.nearchos.water.api.GetDayStatisticsServlet;
@@ -145,7 +144,7 @@ public class DatastoreHelper {
         final LocalDate lastLocalDate = lastDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         final LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return localDate.getDayOfWeek() == DayOfWeek.MONDAY // date is a Monday
-                || Period.between(lastLocalDate, localDate).getDays() >= 7; // or duration between the two is > 7 days
+                || java.time.Period.between(lastLocalDate, localDate).getDays() >= 7; // or duration between the two is > 7 days
     }
 
     /**
@@ -157,7 +156,7 @@ public class DatastoreHelper {
     private static boolean isInLastDays(final int numOfDays, final Date date) {
         final LocalDate today = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         final LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        return Period.between(localDate, today).getDays() <= numOfDays;
+        return java.time.Period.between(localDate, today).getDays() <= numOfDays;
     }
 
     public static void addDayStatistics(final DayStatistics dayStatistics) {
@@ -267,7 +266,8 @@ public class DatastoreHelper {
         for (final Entity monthlyInflowEntity : preparedQuery.asIterable()) {
             final long timestamp = (Long) monthlyInflowEntity.getProperty(PROPERTY_MONTHLY_INFLOW_TIMESTAMP);
             final long year = (Long) monthlyInflowEntity.getProperty(PROPERTY_MONTHLY_INFLOW_YEAR);
-            final MonthlyInflow.Period period = MonthlyInflow.Period.valueOf(monthlyInflowEntity.getProperty(PROPERTY_MONTHLY_INFLOW_PERIOD).toString());
+            final io.github.nearchos.water.data.Period period =
+                    io.github.nearchos.water.data.Period.valueOf(monthlyInflowEntity.getProperty(PROPERTY_MONTHLY_INFLOW_PERIOD).toString());
             final Double inflowInMCM  = (Double) monthlyInflowEntity.getProperty(PROPERTY_MONTHLY_INFLOW_VALUE);
             allMonthlyInflows.add(new MonthlyInflow(timestamp, (int) year, period, inflowInMCM));
         }

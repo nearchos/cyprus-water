@@ -17,6 +17,7 @@ package io.github.nearchos.water.sync;
 import io.github.nearchos.water.data.Data;
 import io.github.nearchos.water.data.DayStatistics;
 import io.github.nearchos.water.data.MonthlyInflow;
+import io.github.nearchos.water.data.Period;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.OLE2NotOfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -27,7 +28,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
@@ -37,7 +37,7 @@ public class Util {
 
     private static final Logger log = Logger.getLogger("cyprus-water");
 
-    private enum FileFormat { HSSF, XSSF };
+    private enum FileFormat { HSSF, XSSF }
 
     static Workbook doRequestXls(final String urlString) throws IOException {
         final URL url = new URL(urlString);
@@ -71,10 +71,10 @@ public class Util {
         return getWorkbook(httpURLConnection.getInputStream(), fileFormat);
     }
 
-    private static DayStatistics getDayStatistics(final InputStream inputStream, final FileFormat fileFormat) throws IOException {
-        final Workbook workbook = getWorkbook(inputStream, fileFormat);
-        return getDayStatistics(workbook);
-    }
+//    private static DayStatistics getDayStatistics(final InputStream inputStream, final FileFormat fileFormat) throws IOException {
+//        final Workbook workbook = getWorkbook(inputStream, fileFormat);
+//        return getDayStatistics(workbook);
+//    }
 
     static Workbook getWorkbook(final InputStream inputStream, final FileFormat fileFormat) throws IOException {
         switch (fileFormat) {
@@ -97,11 +97,6 @@ public class Util {
 
         try {
             final Sheet sheet = workbook.getSheetAt(0);
-//for(int c = 5; c <=5; c++) {
-//    for(int r = 5; r <= 15; r++) {
-//        System.out.println(r + "," + c + " -> " + sheet.getRow(r).getCell(c).getStringCellValue());
-//    }
-//}
             try {
                 date = sheet.getRow(9).getCell(11).getDateCellValue();
             } catch (IllegalStateException ise) {
@@ -110,9 +105,7 @@ public class Util {
             for(int j = 16; j < 41; j++) {
                 final String damName = getDamNameFrmEnglishOrGreek(sheet.getRow(j).getCell(1).getStringCellValue().trim());
                 {
-//System.out.println("damName: " + damName);
                     double damStorage = sheet.getRow(j).getCell(7).getNumericCellValue();
-//System.out.println("damStorage: " + damStorage);
                     if(!damName.isEmpty() && damNamesEn.contains(damName)) {
                         mapStorage.put(damName, damStorage);
                     }
@@ -135,7 +128,7 @@ public class Util {
 
         final Vector<MonthlyInflow> monthlyInflows = new Vector<>();
 
-        final MonthlyInflow.Period [] allPeriods = MonthlyInflow.Period.values();
+        final Period [] allPeriods = Period.values();
 
         // current year
         final LocalDate localDate = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -149,22 +142,17 @@ public class Util {
             final Cell headerCell = sheet.getRow(48).getCell(2);
             final String years = headerCell.toString();
             int currentYear = 2000 + Integer.parseInt(years.substring(0, 2));
-//System.out.println("currentYear: " + currentYear);
 
             for(int c = 2; c <= 12; c++) {
                 for(int r = 49; r <= 59; r++) {
-                    final MonthlyInflow.Period period = allPeriods[r-49];
+                    final Period period = allPeriods[r-49];
                     final int periodOrdinal = period.ordinal();
                     final int correspondingMonthValue = periodOrdinal < 3 ? periodOrdinal + 11 : periodOrdinal - 2; // 1..12
-                    if(period == MonthlyInflow.Period.JANUARY) currentYear++;
-//System.out.print(r + "," + c + " -> ");
+                    if(period == Period.JANUARY) currentYear++;
                     final Cell cell = sheet.getRow(r).getCell(c);
                     final double inflowInMCM = cell.getNumericCellValue();
-//System.out.println(" inflowInMCM: " + inflowInMCM);
                     final MonthlyInflow monthlyInflow = new MonthlyInflow(currentYear, period, inflowInMCM);
-//System.out.println("monthlyInflow: " + monthlyInflow);
                     final boolean examinedPeriodIsInThePresentOrPast = currentYear < yearNow || (currentYear == yearNow && correspondingMonthValue <= monthValueNow);
-//System.out.println(currentYear + ", " + period + " (correspondingMonthValue: " + correspondingMonthValue + ",  ) --> (monthValueNow: " + monthValueNow + ") -> examinedPeriodIsInThePresentOrPast? " + examinedPeriodIsInThePresentOrPast);
                     if(examinedPeriodIsInThePresentOrPast) {
                         monthlyInflows.add(monthlyInflow);
                     }

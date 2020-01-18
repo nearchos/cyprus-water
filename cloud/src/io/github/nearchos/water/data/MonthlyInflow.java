@@ -15,23 +15,20 @@
 package io.github.nearchos.water.data;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 
 public class MonthlyInflow implements Serializable {
-
-    public enum Period {OCTOBER, NOVEMBER, DECEMBER, JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST_AND_SEPTEMBER}
 
     private long timestamp; // creation timestamp
     private int year; // e.g. 2019
     private Period period; // e.g. AUGUST_AND_SEPTEMBER
+    private int periodOrder; // e.g. 8
     private double inflowInMCM; // e.g. 30.495 for December 2019
 
     public MonthlyInflow(long timestamp, int year, Period period, double inflowInMCM) {
         this.timestamp = timestamp;
         this.year = year;
         this.period = period;
+        this.periodOrder = period.getOrder();
         this.inflowInMCM = inflowInMCM;
     }
 
@@ -61,6 +58,7 @@ public class MonthlyInflow implements Serializable {
                 "timestamp=" + timestamp +
                 ", year=" + year +
                 ", period=" + period +
+                ", periodOrder=" + periodOrder +
                 ", inflowInMCM=" + inflowInMCM +
                 '}';
     }
