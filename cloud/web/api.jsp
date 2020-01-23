@@ -105,7 +105,7 @@
 
     <div class="input-group">
         <div class="input-group-button">
-            <span class="link-to-github">Returns an array of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/src/io/github/nearchos/water/data/Dam.java" target="_blank">Dam</a></code>s</span>
+            <span class="link-to-github">Returns an array of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/cloud/src/io/github/nearchos/water/data/Dam.java" target="_blank">Dam</a></code>s</span>
             <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/api/dams','_blank');">
                 Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
             </button>
@@ -131,7 +131,7 @@
 
     <div class="input-group">
         <div class="input-group-button">
-            <span class="link-to-github">Returns an instance of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/src/io/github/nearchos/water/data/DayStatistics.java" target="_blank">DayStatistics</a></code></span>
+            <span class="link-to-github">Returns an instance of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/cloud/src/io/github/nearchos/water/data/DayStatistics.java" target="_blank">DayStatistics</a></code></span>
             <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/api/date-statistics?date=2018-06-21','_blank');">
                 Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
             </button>
@@ -154,7 +154,7 @@
 
     <div class="input-group">
         <div class="input-group-button">
-            <span class="link-to-github">Returns an instance of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/src/io/github/nearchos/water/data/DamsPercentage.java" target="_blank">DamsPercentage</a></code></span>
+            <span class="link-to-github">Returns an instance of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/cloud/src/io/github/nearchos/water/data/DamsPercentage.java" target="_blank">DamsPercentage</a></code></span>
             <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/api/percentages?date=2018-06-21','_blank');">
                 Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
             </button>
@@ -175,7 +175,7 @@
 
     <div class="input-group">
         <div class="input-group-button">
-            <span class="link-to-github">Returns an array of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/src/io/github/nearchos/water/data/MonthlyInflow.java" target="_blank">MonthlyInflow</a>s</code></span>
+            <span class="link-to-github">Returns an array of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/cloud/src/io/github/nearchos/water/data/MonthlyInflow.java" target="_blank">MonthlyInflow</a>s</code></span>
             <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/api/monthly-inflows','_blank');">
                 Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
             </button>
@@ -198,7 +198,7 @@
 
     <div class="input-group">
         <div class="input-group-button">
-            <span class="link-to-github">Returns an array of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/src/io/github/nearchos/water/data/Event.java" target="_blank">Event</a>s</code></span>
+            <span class="link-to-github">Returns an array of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/cloud/src/io/github/nearchos/water/data/Event.java" target="_blank">Event</a>s</code></span>
             <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/api/events?from=2019-12-21','_blank');">
                 Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
             </button>
@@ -220,7 +220,7 @@
 
     <div class="input-group">
         <div class="input-group-button">
-            <span class="link-to-github">Returns an instance of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/src/io/github/nearchos/water/data/Timeseries.java" target="_blank">Timeseries</a></code></span>
+            <span class="link-to-github">Returns an instance of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/cloud/src/io/github/nearchos/water/data/Timeseries.java" target="_blank">Timeseries</a></code></span>
             <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/api/timeseries','_blank');">
                 Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
             </button>
@@ -243,7 +243,7 @@
 
     <div class="input-group">
         <div class="input-group-button">
-            <span class="link-to-github">The reply is an instance of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/src/io/github/nearchos/water/api/Message.java" target="_blank">Message</a></code></span>
+            <span class="link-to-github">The reply is an instance of <code><a href="https://github.com/nearchos/cyprus-water/blob/master/cloud/src/io/github/nearchos/water/api/Message.java" target="_blank">Message</a></code></span>
             <button title="Try the URL" onclick="window.open('https://cyprus-water.appspot.com/sync/grab','_blank');">
                 Try it <img class="clippy" width="13" src="images/icons8-external-link.svg" alt="Try the URL">
             </button>

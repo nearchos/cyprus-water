@@ -124,7 +124,7 @@ public class Data {
             "    \"nameEl\": \"Κανναβιού\",\n" +
             "    \"yearOfConstruction\": 2005,\n" +
             "    \"height\": 75,\n" +
-            "    \"capacity\": 18000000,\n" +
+            "    \"capacity\": 17168000,\n" +
             "    \"lat\": 34.92770004272461,\n" +
             "    \"lng\": 32.587799072265625,\n" +
             "    \"riverNameEl\": \"Έζουσα\",\n" +

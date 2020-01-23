@@ -45,7 +45,7 @@ public class GetDamsServlet extends HttpServlet {
             response.getWriter().println(damsJson); // write the response
         } else {
             final Vector<Dam> dams = DatastoreHelper.getDams();
-            if (dams == null || dams.isEmpty()) {
+            if (dams.isEmpty()) {
                 final Message errorMessage = Message.getErrorMessage("Hmmm, missing dams data. Please contact the developer.");
                 response.getWriter().println(gson.toJson(errorMessage));
             } else {
@@ -62,6 +62,5 @@ public class GetDamsServlet extends HttpServlet {
         final Vector<Dam> dams = DatastoreHelper.getDams();
         System.out.println(dams);
         System.out.println(gson.toJson(dams));
-
     }
 }
