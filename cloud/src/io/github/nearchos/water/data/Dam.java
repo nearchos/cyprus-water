@@ -93,4 +93,21 @@ public class Dam implements Serializable {
     public String getWikipediaUrl() {
         return wikipediaUrl;
     }
+
+    @Override
+    public String toString() {
+        return "Dam{" +
+                "nameEn='" + nameEn + '\'' +
+                ", nameEl='" + nameEl + '\'' +
+                ", yearOfConstruction=" + yearOfConstruction +
+                ", height=" + height +
+                ", capacity=" + capacity +
+                ", lat=" + lat +
+                ", lng=" + lng +
+                ", riverNameEl='" + riverNameEl + '\'' +
+                ", typeEl='" + typeEl + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", wikipediaUrl='" + wikipediaUrl + '\'' +
+                '}';
+    }
 }

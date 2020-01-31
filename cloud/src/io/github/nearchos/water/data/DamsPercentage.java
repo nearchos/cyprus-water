@@ -22,11 +22,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import static io.github.nearchos.water.data.Dam.ONE_MILLION;
 import static io.github.nearchos.water.data.DayStatistics.SIMPLE_DATE_FORMAT;
 
 public class DamsPercentage implements Serializable {
+
+    public static final Logger log = Logger.getLogger("data");
 
     private transient static final Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
@@ -49,7 +52,13 @@ public class DamsPercentage implements Serializable {
         final Dam [] allDams = gson.fromJson(Data.DAMS_JSON, Dam [].class);
         for(final Dam dam : allDams) {
             tempTotalCapacityInCM += dam.getCapacity();
-            damNamesToPercentage.put(dam.getNameEn(), dayStatistics.getStorageInMCM(dam.getNameEn()) / dam.getCapacityInMCM());
+
+            final String damNameEn = dam.getNameEn();
+            try {
+                damNamesToPercentage.put(damNameEn, dayStatistics.getStorageInMCM(damNameEn) / dam.getCapacityInMCM());
+            } catch (Exception e) {
+                log.warning("DayStatistics do not contain info for dam '" + damNameEn + "', dayStatistics: " + dayStatistics);
+            }
         }
 
         this.totalCapacityInMCM = 1D * tempTotalCapacityInCM / ONE_MILLION;
